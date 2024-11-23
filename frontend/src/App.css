@@ -1,0 +1,61 @@
+/* src/App.css */
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: #787676;
+}
+
+.App {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.game-state,
+.time-control,
+.property-list {
+  margin-bottom: 30px;
+}
+
+.property-card {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+}
+
+.property-card h3 {
+  margin-top: 0;
+}
+
+.property-card p {
+  margin: 5px 0;
+}
+
+.owned-actions,
+.upgrade-paths {
+  margin-top: 10px;
+}
+
+button {
+  margin-right: 10px;
+  padding: 5px 10px;
+}
+
+.speed-control {
+  margin-top: 10px;
+}
+
+.speed-control label {
+  margin-right: 10px;
+}
+
+.error {
+  color: red;
+}
