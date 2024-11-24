@@ -12,8 +12,10 @@ import (
 func InitializeGame() *ecs.World {
 	world := ecs.NewWorld()
 
+	initialDate := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
 	gameTimeModel := &models.GameTime{
-		CurrentDate:     time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
+		CurrentDate:     initialDate,
+		LastUpdated:     initialDate,
 		IsPaused:        false,
 		SpeedMultiplier: 1.0,
 	}
