@@ -10,7 +10,7 @@ import (
 
 	"github.com/markbmullins/city-developer/pkg/actions"
 	"github.com/markbmullins/city-developer/pkg/ecs"
-	"github.com/rs/cors" // Import the rs/cors package
+	"github.com/rs/cors"
 )
 
 var mu sync.Mutex

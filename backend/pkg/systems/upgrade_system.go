@@ -35,7 +35,7 @@ func handleUpgrades(world *ecs.World, property *models.Property) {
 }
 
 // applyUpgradeToProperty updates the rent based on the upgrade and marks it as applied.
-func applyUpgradeToProperty(world *ecs.World, property *models.Property, upgrade *models.Upgrade) {
+func applyUpgradeToProperty(_ *ecs.World, property *models.Property, upgrade *models.Upgrade) {
 	property.RentBoost += upgrade.RentIncrease
 	upgrade.Applied = true
 	fmt.Printf("Applied upgrade '%s' to property '%s' with RentIncrease: %.2f\n", upgrade.Name, property.Name, upgrade.RentIncrease)

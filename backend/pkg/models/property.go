@@ -12,35 +12,43 @@ const (
 
 // Subtypes for residential properties
 const (
-	SingleFamily PropertySubtype = "SingleFamily"
-	Townhome     PropertySubtype = "Townhome"
-	Multifamily  PropertySubtype = "Multifamily"
 	Apartment    PropertySubtype = "Apartment"
 	Condo        PropertySubtype = "Condo"
+	Duplex       PropertySubtype = "Duplex"
+	Multifamily  PropertySubtype = "Multifamily"
+	Penthouse    PropertySubtype = "Penthouse"
+	SingleFamily PropertySubtype = "SingleFamily"
+	Townhome     PropertySubtype = "Townhome"
 )
 
 // Subtypes for commercial properties
 const (
-	OfficeSpace        PropertySubtype = "OfficeSpace"
-	RetailStore        PropertySubtype = "RetailStore"
-	Warehouse          PropertySubtype = "Warehouse"
-	Restaurant         PropertySubtype = "Restaurant"
-	Hotel              PropertySubtype = "Hotel"
-	Mall               PropertySubtype = "Mall"
-	Industrial         PropertySubtype = "Industrial"
+	Amusement          PropertySubtype = "Amusement"
+	ArtGallery         PropertySubtype = "ArtGallery"
+	Bakery             PropertySubtype = "Bakery"
+	Bar                PropertySubtype = "Bar"
+	Cafe               PropertySubtype = "Cafe"
 	Clinic             PropertySubtype = "Clinic"
 	DataCenter         PropertySubtype = "DataCenter"
-	Bar                PropertySubtype = "Bar"
-	NightClub          PropertySubtype = "NightClub"
-	Museum             PropertySubtype = "Museum"
-	Amusement          PropertySubtype = "Amusement"
-	Factory            PropertySubtype = "Factory"
 	DistributionCenter PropertySubtype = "DistributionCenter"
+	Factory            PropertySubtype = "Factory"
+	Gym                PropertySubtype = "Gym"
+	Hotel              PropertySubtype = "Hotel"
+	Industrial         PropertySubtype = "Industrial"
+	Mall               PropertySubtype = "Mall"
+	Museum             PropertySubtype = "Museum"
+	NightClub          PropertySubtype = "NightClub"
+	OfficeSpace        PropertySubtype = "OfficeSpace"
+	Restaurant         PropertySubtype = "Restaurant"
+	RetailStore        PropertySubtype = "RetailStore"
+	Salon              PropertySubtype = "Salon"
+	Warehouse          PropertySubtype = "Warehouse"
 )
 
 type Property struct {
 	Name                         string
 	Type                         PropertyType
+	ID                           int
 	Subtype                      PropertySubtype
 	BaseRent                     float64
 	RentBoost                    float64
@@ -55,5 +63,7 @@ type Property struct {
 	PurchaseDate                 time.Time
 	ProrateRent                  bool
 	NeighborhoodID               int
-	UgradedNeighborhoodRentBoost float64
+	UpgradedNeighborhoodRentBoost float64
+	Description                  string
+	Address                      string
 }

@@ -312,7 +312,7 @@ func roundToNearest5(num float64) float64 {
 
 // calculateMonthsPassed determines how many full months have passed between two dates.
 func calculateMonthsPassed(lastUpdated, currentDate time.Time) int {
-	fmt.Printf("Calculating months passed from %s to %s\n", lastUpdated.Format("2006-01-02"), currentDate.Format("2006-01-02"))
+	// fmt.Printf("Calculating months passed from %s to %s\n", lastUpdated.Format("2006-01-02"), currentDate.Format("2006-01-02"))
 
 	if currentDate.Before(lastUpdated) {
 		fmt.Println("Current date is before last updated date; months passed: 0")
