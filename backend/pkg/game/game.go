@@ -8,6 +8,7 @@ import (
 	"github.com/markbmullins/city-developer/pkg/ecs"
 	"github.com/markbmullins/city-developer/pkg/models"
 	"github.com/markbmullins/city-developer/pkg/neighborhoods"
+	"github.com/markbmullins/city-developer/pkg/properties"
 	"github.com/markbmullins/city-developer/pkg/systems"
 )
 
@@ -44,17 +45,13 @@ func InitializeGame() *ecs.World {
 		neighborhoods.GetWillowFlatsNeighborhood(),
 	}
 
-	// Add properties from all neighborhoods to the ECS world
-	for _, neighborhood := range allNeighborhoods {
-		for _, propID := range neighborhood.PropertyIDs {
-			// Retrieve property details by propID and add to the world
-			// This assumes you have a centralized way to access properties by ID
-			property := getPropertyByID(propID) // Implement this function as needed
-			if property == nil {
-				log.Printf("Property with ID %d not found", propID)
-				continue
-			}
-			addPropertyToWorld(world, *property)
+	// Initialize the property registry
+	propertyRegistry := properties.NewPropertyRegistry()
+
+	// Add properties to the ECS world
+	for _, property := range propertyRegistry.GetAllProperties() {
+		if err := addPropertyToWorld(world, property); err != nil {
+			log.Printf("Error adding property ID %d: %v", property.ID, err)
 		}
 	}
 
