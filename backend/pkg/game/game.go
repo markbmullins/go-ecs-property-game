@@ -12,10 +12,34 @@ import (
 
 func InitializeGame() *ecs.World {
 	world := ecs.NewWorld()
-
 	initialDate := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
 
-	// Add game time as a component to the world
+	initializeGameTime(world, initialDate)
+	initializePlayer(world)
+	initializeProperties(world)
+	initializeNeighborhoods(world)
+	initializeSystems(world)
+
+	return world
+}
+
+var allNeighborhoods = []*components.Neighborhood{
+	neighborhoods.GetDowntownDistrictNeighborhood(),
+	neighborhoods.GetHistoricHeightsNeighborhood(),
+	neighborhoods.GetTechValleyNeighborhood(),
+	neighborhoods.GetCedarGroveNeighborhood(),
+	neighborhoods.GetWillowFlatsNeighborhood(),
+}
+
+var allProperties = slices.Concat(
+	neighborhoods.GetDowntownProperties(),
+	neighborhoods.GetHistoricHeightsProperties(),
+	neighborhoods.GetTechValleyProperties(),
+	neighborhoods.GetCedarGroveProperties(),
+	neighborhoods.GetWillowFlatsProperties(),
+)
+
+func initializeGameTime(world *ecs.World, initialDate time.Time) {
 	timeEntity := ecs.NewEntity(0)
 	timeEntity.AddComponent("GameTime", &components.GameTime{
 		CurrentDate:       initialDate,
@@ -25,56 +49,40 @@ func InitializeGame() *ecs.World {
 		RentCollectionDay: 1,
 	})
 	world.AddEntity(timeEntity)
+}
 
-	// Create player entity
+func initializePlayer(world *ecs.World) {
 	playerEntity := ecs.NewEntity(1)
-	playerEntity.AddComponent("Player", &components.Player{ID: 1, Funds: 10000})
+	playerEntity.AddComponent("Player", &components.Player{
+		ID:         1,
+		Funds:      10000,
+		Properties: []*components.Property{},
+	})
 	world.AddEntity(playerEntity)
+	world.AddEntity(playerEntity)
+}
 
-	// List of all neighborhoods
-	allNeighborhoods := []*components.Neighborhood{
-		neighborhoods.GetDowntownDistrictNeighborhood(),
-		neighborhoods.GetHistoricHeightsNeighborhood(),
-		neighborhoods.GetTechValleyNeighborhood(),
-		neighborhoods.GetCedarGroveNeighborhood(),
-		neighborhoods.GetWillowFlatsNeighborhood(),
-	}
-
-	allProperties := slices.Concat(neighborhoods.GetDowntownProperties(),
-		neighborhoods.GetHistoricHeightsProperties(),
-		neighborhoods.GetTechValleyProperties(),
-		neighborhoods.GetCedarGroveProperties(),
-		neighborhoods.GetWillowFlatsProperties())
-
-	// Add properties to the ECS world
+func initializeProperties(world *ecs.World) {
 	for _, property := range allProperties {
-		addPropertyToWorld(world, &property)
+		entity := ecs.NewEntity(property.ID)
+		entity.AddComponent("Property", property)
+		world.AddEntity(entity)
 	}
+}
 
-	// Initialize and add systems
-	neighborhoodValueSystem := &systems.NeighborhoodValueSystem{
-		Neighborhoods: getNeighborhoodMap(allNeighborhoods),
+func initializeNeighborhoods(world *ecs.World) {
+	neighborhoodMap := make(map[int]*components.Neighborhood)
+	for _, neighborhood := range allNeighborhoods {
+		neighborhoodMap[neighborhood.ID] = neighborhood
+		neighborhoodEntity := ecs.NewEntity(neighborhood.ID)
+		neighborhoodEntity.AddComponent("Neighborhood", neighborhood)
+		world.AddEntity(neighborhoodEntity)
 	}
+}
 
+func initializeSystems(world *ecs.World) {
 	world.AddSystem(&systems.IncomeSystem{})
-	world.AddSystem(neighborhoodValueSystem)
+	world.AddSystem(&systems.NeighborhoodValueSystem{})
 	world.AddSystem(&systems.PropertyManagementSystem{})
 	world.AddSystem(&systems.TimeSystem{})
-
-	return world
-}
-
-func addPropertyToWorld(world *ecs.World, prop *components.Property) {
-	entity := ecs.NewEntity(prop.ID)
-	entity.AddComponent("Property", prop)
-	world.AddEntity(entity)
-}
-
-// getNeighborhoodMap creates a map of Neighborhood ID to Neighborhood pointer
-func getNeighborhoodMap(neighborhoods []*components.Neighborhood) map[int]*components.Neighborhood {
-	neighborhoodMap := make(map[int]*components.Neighborhood)
-	for _, neighborhood := range neighborhoods {
-		neighborhoodMap[neighborhood.ID] = neighborhood
-	}
-	return neighborhoodMap
 }
