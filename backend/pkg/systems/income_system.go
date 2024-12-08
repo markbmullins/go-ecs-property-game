@@ -11,31 +11,9 @@ import (
 	"github.com/markbmullins/city-developer/pkg/utils"
 )
 
-// Purchase Month Rent Proration:
-
-//     Purchase Day: No rent is collected.
-//     Rent Collection Starts: From the day after the purchase date.
-
-// Upgrade Application:
-
-//     Upgrade Completion Day: No rent increase is applied on the day the upgrade is completed.
-//     Rent Increase Starts: From the day after the upgrade completion date.
-
-// General Rules:
-
-//     Prorated Rent Calculation: Rent is calculated based on the number of days the property (and any upgrades) are owned excluding the purchase or upgrade completion day.
-//     Full Rent Collection: Once a month has fully elapsed (excluding the purchase day), full rent (including any applicable upgrades) is collected.
-
-// - in my game, i can gave different time advancement speeds. sometimes those speeds can go higher than 30 days
-// - the first month a property is purchased, the rent should be prorated from the day of purchase. if you purchase a property on the first day you get the full rent minus 1 day. if you purchase a property on the last day of the month, prorated rent is 0 and you collect full rent the next month. the day of purchase DOES NOT GENERATE RENT.
-// - upgrades should increase the rent the based on their RentIncrease
-// - if you upgrade a property mid month, the upgrade boost should be prorated following the same rules as properties. It takes effect on the day purchaseDate + DaysToComplete (the day when the upgrade is finished)
-// - careful consideration should be made for edge cases, first and last day in a month, leap years, etc.
-// Similar to how, in the first month, the purchase month, rent should not be collected on the purchase date, it kicks in the next day. similarly, in the month an upgrade was completed, upgrades should not be counted on the day the upgrade was completed. rather, the next day. So if a property was purchased in Jan, upgraded in feb, base rent would be prorated in jan, the only the upgrade bonus would be prorated in feb, then in march the player would collect the full amount. if a property is purchased and upgraded in the same month, the base rent should be prorated from day after the purchase date and the upgrade rent would be prorated from the day after the upgrade is completed, the next month the player would collect the full rent and upgrade bonus.
-
 /*
 ===========================================================
-                     INCOME SYSTEM REQUIREMENTS
+                     INCOME SYSTEM
 ===========================================================
 
 1. **Purchase Mechanics**
@@ -43,6 +21,7 @@ import (
    - **Rent Collection Start:** Begins the day after the purchase date.
    - **First Month Proration:**
      - *First Day Purchase:* Full rent minus one day.
+		 - *Mid Month Purchase:* Rent is collected from the day after purchase until the end of the month
      - *Last Day Purchase:* Prorated rent is 0; full rent starts the next month.
 
 2. **Upgrade Mechanics**
@@ -65,19 +44,6 @@ import (
 
 5. **Edge Case Handling**
    - **Calendar Variations:** Correctly handles months with 28-31 days and leap years (February with 29 days).
-   - **Same Month Transactions:**
-     - *Purchase & Upgrade in Same Month:*
-       - Base rent prorated from day after purchase.
-       - Upgrade rent prorated from day after upgrade completion.
-       - Full rent and upgrade bonus collected the following month.
-   - **Boundary Days:** Ensures accurate calculations for purchases or upgrades on the first or last day of a month.
-
-6. **Implementation Guidelines**
-   - **Day Exclusions:** Exclude Purchase Day and Upgrade Completion Day from rent generation.
-   - **Accurate Day Counting:** Implement precise mechanisms to count qualifying days for proration.
-   - **Testing & Validation:**
-     - Develop test cases for first/last day purchases, mid-month upgrades, leap years, and variable time speeds.
-     - Verify all edge cases to ensure correct rent calculations.
 
 **Key Rules Summary:**
 - No rent is collected on Purchase Day or Upgrade Completion Day.
@@ -88,13 +54,7 @@ import (
 
 ===========================================================
 */
-
-// IncomeSystem handles rent collection, including prorated rent for the first month and upgrades.
-// type IncomeSystem struct{}
-
-// Update triggers the rent collection process, handling fast-forwarding of time.
 type IncomeSystem struct{}
-
 // Update triggers the rent collection process, handling fast-forwarding of time.
 func (s *IncomeSystem) Update(world *ecs.World) {
 	gameTime, err := utils.GetCurrentGameTime(world)
@@ -113,14 +73,12 @@ func (s *IncomeSystem) Update(world *ecs.World) {
 	}
 }
 
-// processRent collects rent for all elapsed months, handling partial and full months.
 func processRent(world *ecs.World, lastUpdated time.Time, monthsPassed int) {
-	// location := lastUpdated.Location()
 	firstOfNextMonth := nextMonthStart(lastUpdated)
 
-	// Handle partial month
+	// Handle partial month (if lastUpdated isn't at the end of its month)
 	if isPartialMonth(lastUpdated) {
-		processPartialMonth(world, lastUpdated, monthEnd(lastUpdated))
+		processMonth(world, lastUpdated, monthEnd(lastUpdated))
 		monthsPassed--
 	}
 
@@ -128,26 +86,17 @@ func processRent(world *ecs.World, lastUpdated time.Time, monthsPassed int) {
 	for i := 0; i < monthsPassed; i++ {
 		startOfMonth := firstOfNextMonth.AddDate(0, i, 0)
 		endOfMonth := monthEnd(startOfMonth)
-		processFullMonth(world, startOfMonth, endOfMonth)
+		processMonth(world, startOfMonth, endOfMonth)
 	}
 }
 
-// processPartialMonth collects prorated rent for a partial month.
-func processPartialMonth(world *ecs.World, startDate, endDate time.Time) {
+func processMonth(world *ecs.World, startDate, endDate time.Time) {
 	for _, entity := range world.Entities {
-		processEntityRent(world, entity, startDate, endDate, true)
+		processEntityRent(world, entity, startDate, endDate)
 	}
 }
 
-// processFullMonth collects full rent for a given month.
-func processFullMonth(world *ecs.World, startOfMonth, endOfMonth time.Time) {
-	for _, entity := range world.Entities {
-		processEntityRent(world, entity, startOfMonth, endOfMonth, false)
-	}
-}
-
-// processEntityRent calculates and distributes rent for a single entity.
-func processEntityRent(world *ecs.World, entity *ecs.Entity, startDate, endDate time.Time, isPartial bool) {
+func processEntityRent(world *ecs.World, entity *ecs.Entity, startDate, endDate time.Time) {
 	propComp := entity.GetComponent("PropertyComponent")
 	if propComp == nil {
 		return
@@ -158,77 +107,80 @@ func processEntityRent(world *ecs.World, entity *ecs.Entity, startDate, endDate 
 		return
 	}
 
-	if isPartial {
-		if property.PurchaseDate.After(endDate) {
-			return
-		}
-		collectProratedRent(world, property, startDate, endDate)
-	} else if property.PurchaseDate.Before(startDate) || property.PurchaseDate.Equal(startDate) {
-		collectFullRent(world, property, startDate, endDate)
-	} else {
-		collectProratedRent(world, property, startDate, endDate)
+	rent := calculateMonthlyRent(property, startDate, endDate)
+	if rent > 0 {
+		distributeRentToOwner(world, property, rent)
 	}
 }
 
-// collectProratedRent calculates prorated rent for a property.
-func collectProratedRent(world *ecs.World, property *models.Property, startDate, endDate time.Time) {
-	daysOwned := calculateDaysOwned(startDate, endDate, property.PurchaseDate)
-	proratedRent := calculateProratedRent(property, float64(daysOwned), float64(daysInMonth(startDate)))
-	distributeRentToOwner(world, property, proratedRent)
-}
+// calculateMonthlyRent calculates the rent owed for a given property within the given month.
+// It adheres to the following rules:
+// - No rent on the purchase day; rent begins the day after purchase if within the month.
+// - Each upgrade also begins contributing rent the day after it completes, if within the month.
+// - Both base rent and upgrades are prorated based on the number of days active in the month.
+// - After determining total active days for the property and any upgrades, it rounds the total rent down to the nearest multiple of 5.
+func calculateMonthlyRent(property *models.Property, monthStart, monthEnd time.Time) float64 {
+	daysInCurrentMonth := float64(daysInMonth(monthStart))
+	if daysInCurrentMonth == 0 {
+		// Safety check: Should never happen since daysInMonth should always return > 0
+		return 0
+	}
 
-// collectFullRent calculates and distributes full rent for a property.
-func collectFullRent(world *ecs.World, property *models.Property, monthStart, monthEnd time.Time) {
-	fullRent := calculateFullRent(property, monthStart, monthEnd)
-	distributeRentToOwner(world, property, fullRent)
-}
+	// Determine when the property first becomes eligible to collect rent this month.
+	// Rent starts the day after the purchase date, if that day falls within this month.
+	propertyRentStartDate := maxTime(property.PurchaseDate.AddDate(0, 0, 1), monthStart)
+	if propertyRentStartDate.After(monthEnd) {
+		// The property wasn't active this month at all (e.g., purchased too late in the month).
+		return 0
+	}
 
-// calculateProratedRent computes prorated rent for a property, including upgrades.
-func calculateProratedRent(property *models.Property, daysOwned, daysInMonth float64) float64 {
-	baseProrated := (property.BaseRent * daysOwned) / daysInMonth
-	upgradeProrated := calculateUpgradeProration(property, daysOwned, daysInMonth)
-	return roundToNearest5(baseProrated + upgradeProrated)
-}
+	// Calculate the number of days the property is active in this month.
+	propertyRentDays := countDaysInRange(propertyRentStartDate, monthEnd)
 
-// calculateFullRent computes full rent for a property, including upgrades.
-func calculateFullRent(property *models.Property, monthStart, monthEnd time.Time) float64 {
-	baseRent := property.BaseRent
-	upgradeIncrease := calculateUpgradeRent(property, monthStart, monthEnd)
-	return baseRent + upgradeIncrease
-}
+	// Calculate daily base rent by dividing the base rent by the total days in the month.
+	baseDailyRent := property.BaseRent / daysInCurrentMonth
 
-// calculateUpgradeRent computes the rent increase from upgrades for a given month.
-func calculateUpgradeRent(property *models.Property, monthStart, monthEnd time.Time) float64 {
-	total := 0.0
+	totalBaseRent := (baseDailyRent * float64(propertyRentDays))
+
+	// Calculate the total rent from all upgrades active during this month.
+	// Each upgrade also begins contributing rent the day after its completion date.
+	totalUpgradeRent := 0.0
 	for _, upgrade := range property.Upgrades {
-		completionDate := upgrade.PurchaseDate.AddDate(0, 0, upgrade.DaysToComplete)
-		if completionDate.Before(monthStart) {
-			total += upgrade.RentIncrease
-		} else if completionDate.After(monthStart) && completionDate.Before(monthEnd.AddDate(0, 0, 1)) {
-			daysActive := float64(monthEnd.Sub(completionDate).Hours() / 24)
-			total += (upgrade.RentIncrease * daysActive) / float64(daysInMonth(monthStart))
+		upgradeCompletionDate := upgrade.PurchaseDate.AddDate(0, 0, upgrade.DaysToComplete)
+		upgradeRentStart := upgradeCompletionDate.AddDate(0, 0, 1)
+
+		// Determine when the upgrade becomes active in this month.
+		upgradeActiveStart := maxTime(upgradeRentStart, monthStart)
+		if upgradeActiveStart.After(monthEnd) {
+			// This upgrade wasn't active during this month.
+			continue
+		}
+
+		// An upgrade only contributes rent if the property itself is active.
+		// Find the intersection of the property's active period and the upgrade's active period.
+		upgradeIntersectionStart := maxTime(propertyRentStartDate, upgradeActiveStart)
+		if upgradeIntersectionStart.After(monthEnd) {
+			// No intersection means no contribution from this upgrade.
+			continue
+		}
+
+		// Count how many days this upgrade was both active and within the property's active period this month.
+		intersectionDays := countDaysInRange(upgradeIntersectionStart, monthEnd)
+		if intersectionDays > 0 {
+			upgradeDailyRent := upgrade.RentIncrease / daysInCurrentMonth
+			totalUpgradeRent += (upgradeDailyRent * float64(intersectionDays))
 		}
 	}
-	return total
+
+	// Total rent is the sum of the prorated base rent and the prorated upgrades rent.
+	totalRent := totalBaseRent + totalUpgradeRent
+
+	// Round down to the nearest multiple of 5 per the given rounding rule.
+	return roundToNearest5(totalRent)
 }
 
-// calculateUpgradeProration computes prorated upgrade rent for a given month.
-func calculateUpgradeProration(property *models.Property, daysOwned, daysInMonth float64) float64 {
-	total := 0.0
-	for _, upgrade := range property.Upgrades {
-		completionDate := upgrade.PurchaseDate.AddDate(0, 0, upgrade.DaysToComplete)
-		if completionDate.Before(property.PurchaseDate) {
-			total += upgrade.RentIncrease
-		} else {
-			daysActive := daysOwned - float64(completionDate.Day())
-			if daysActive > 0 {
-				total += (upgrade.RentIncrease * daysActive) / daysInMonth
-			}
-		}
-	}
-	return total
-}
 
+// distribute rent to correct player
 func distributeRentToOwner(world *ecs.World, property *models.Property, rent float64) {
 	for _, entity := range world.Entities {
 		playerComp := entity.GetComponent("PlayerComponent")
@@ -253,17 +205,6 @@ func calculateMonthsPassed(lastUpdated, currentDate time.Time) int {
 	return monthsPassed
 }
 
-func calculateDaysOwned(startDate, endDate, purchaseDate time.Time) int {
-	if purchaseDate.Before(startDate) {
-		return int(endDate.Sub(startDate).Hours()/24) + 1
-	}
-	return int(endDate.Sub(purchaseDate).Hours() / 24)
-}
-
-func roundToNearest5(value float64) float64 {
-	return math.Floor(value/5) * 5
-}
-
 func daysInMonth(date time.Time) int {
 	return date.AddDate(0, 1, -date.Day()).Day()
 }
@@ -278,4 +219,31 @@ func monthEnd(date time.Time) time.Time {
 
 func isPartialMonth(date time.Time) bool {
 	return date.Day() != daysInMonth(date)
+}
+
+func roundToNearest5(value float64) float64 {
+	return math.Floor(value/5) * 5
+}
+
+// countDaysInRange counts INCLUSIVE days from startDate to endDate.
+// For example:
+// If startDate = 2024-12-01 and endDate = 2024-12-03,
+// the days are counted as:
+// 2024-12-01 (Day 1),
+// 2024-12-02 (Day 2),
+// 2024-12-03 (Day 3).
+// Total = 3 days (inclusive).
+func countDaysInRange(startDate, endDate time.Time) int {
+	if startDate.After(endDate) {
+		return 0
+	}
+	return int(endDate.Sub(startDate).Hours()/24) + 1
+}
+
+// maxTime returns the max of two times.
+func maxTime(a, b time.Time) time.Time {
+	if a.After(b) {
+		return a
+	}
+	return b
 }

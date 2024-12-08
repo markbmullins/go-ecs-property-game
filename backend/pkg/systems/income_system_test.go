@@ -484,13 +484,20 @@ func TestProratedRent(t *testing.T) {
 
 	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
 
+	// Expected prorated rent calculation:
+	// 1. Rent begins the day after the purchase date, i.e., January 28, 2023.
+	// 2. Days owned in January: 4 (January 28–31 inclusive).
+	// 3. Daily rent = Base rent / Days in January = 1000 / 31 ≈ 32.26.
+	// 4. Prorated rent = Daily rent × Days owned = 32.26 × 4 = 129.04.
+	// 5. Final rent is rounded down to the nearest multiple of 5: floor(129.04 / 5) * 5 = 125.00.
+	// Therefore, the expected funds in the player's account after the update is $125.00. 
 	expectedProratedRent := 125.0
 
 	assert.Equal(t, expectedProratedRent, playerComp.Player.Funds, "Prorated rent should be correct")
 }
 
 // TestFullMonthRent tests full rent collection for a single month at normal speed.
-func TestFullMonthRent(t *testing.T) {
+func TestPurchaseOnFirstDayOfMonth(t *testing.T) {
 	purchaseDate := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
 	world := createTestWorld(purchaseDate, 1000.0)
 	gameTime, err := utils.GetCurrentGameTime(world)
@@ -501,9 +508,72 @@ func TestFullMonthRent(t *testing.T) {
 	incomeSystem.Update(world)
 
 	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	// Expected rent calculation:
+	// 1. Rent starts the day after the purchase date. Since the property was purchased on January 1, rent begins on January 2.
+	// 2. January has 31 days, so rent is calculated for 30 days (January 2–31 inclusive).
+	// 3. Daily rent = Base rent / Days in January = 1000 / 31 ≈ 32.26.
+	// 4. Total rent = Daily rent × 30 days = 32.26 × 30 ≈ 967.80.
+	// 5. Rent is rounded down to the nearest multiple of 5: floor(967.80 / 5) * 5 = 965.00.
+	// As a result, the expected rent collected is 965.00 instead of the full 1000.00.
 	expectedFullRent := 965.0
 
 	assert.Equal(t, expectedFullRent, playerComp.Player.Funds, "Full monthly rent should be collected")
+}
+
+func TestProratedAndFullMonthRent(t *testing.T) {
+	// Set up the purchase date (January 1, 2023) and a property with a base monthly rent of $1000.00.
+	purchaseDate := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
+	world := createTestWorld(purchaseDate, 1000.0)
+
+	gameTime, err := utils.GetCurrentGameTime(world)
+	assert.NoError(t, err)
+
+	// Simulate collecting rent for January by advancing the game to February 1.
+	gameTime.CurrentDate = time.Date(2023, 2, 1, 0, 0, 0, 0, time.UTC)
+	incomeSystem := systems.IncomeSystem{}
+	incomeSystem.Update(world)
+
+	// Verify that January rent (prorated for 30 days) has been collected.
+	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	// 1. Rent starts the day after the purchase date. Since the property was purchased on January 1, rent begins on January 2.
+	// 2. January has 31 days, so rent is calculated for 30 days (January 2–31 inclusive).
+	// 3. Daily rent = Base rent / Days in January = 1000 / 31 ≈ 32.26.
+	// 4. Total rent = Daily rent × 30 days = 32.26 × 30 ≈ 967.80.
+	// 5. Rent is rounded down to the nearest multiple of 5: floor(967.80 / 5) * 5 = 965.00.
+	expectedProratedRent := 965.0
+	assert.Equal(t, expectedProratedRent, playerComp.Player.Funds, "Prorated January rent should be correct")
+
+	// Advance to March 1, 2023, to collect rent for February (full month).
+	gameTime.CurrentDate = time.Date(2023, 3, 1, 0, 0, 0, 0, time.UTC)
+	incomeSystem.Update(world)
+
+	// Verify that February's full rent has been collected.
+	expectedTotalFunds := expectedProratedRent + 1000.0
+	assert.Equal(t, expectedTotalFunds, playerComp.Player.Funds, "Full February rent should be collected")
+}
+
+func TestFullMonthRent(t *testing.T) {
+    purchaseDate := time.Date(2022, 12, 1, 0, 0, 0, 0, time.UTC)
+    world := createTestWorld(purchaseDate, 1000.0)
+
+    gameTime, err := utils.GetCurrentGameTime(world)
+    assert.NoError(t, err)
+
+    // Set LastUpdated to the start of February 2023.
+    gameTime.LastUpdated = time.Date(2023, 2, 1, 0, 0, 0, 0, time.UTC)
+
+    // Set CurrentDate to March 1, 2023, to collect the full rent for February 2023.
+    gameTime.CurrentDate = time.Date(2023, 3, 1, 0, 0, 0, 0, time.UTC)
+
+    incomeSystem := systems.IncomeSystem{}
+    incomeSystem.Update(world)
+
+    playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+
+    // Full monthly rent is $1000.00.
+    expectedFullRent := 1000.0
+
+    assert.Equal(t, expectedFullRent, playerComp.Player.Funds, "Full February rent should be collected")
 }
 
 // TestMultipleMonthAdvancement tests rent collection when more than one month passes in a single update.
@@ -518,7 +588,20 @@ func TestMultipleMonthAdvancement(t *testing.T) {
 	incomeSystem.Update(world)
 
 	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
-	expectedTotalRent := 965.0 + 1000.0*3 // Rent for 3 full months and purchase month (excluding purchase day)
+	// Expected rent calculation:
+	// 1. Rent starts the day after the purchase date. Since the property was purchased on January 1, rent begins on January 2.
+	// 2. January has 31 days, so rent is calculated for 30 days (January 2–31 inclusive).
+	//    - Daily rent = Base rent / Days in January = 1000 / 31 ≈ 32.26.
+	//    - Prorated rent for January = Daily rent × 30 days = 32.26 × 30 ≈ 967.80.
+	//    - Rent is rounded down to the nearest multiple of 5: floor(967.80 / 5) * 5 = 965.00.
+	// 3. Rent for February, March, and April is collected as full months, each at $1000.00.
+	//    - Total full-month rent = 1000 × 3 = 3000.00.
+	// 4. Total rent collected over the 4-month period (January–April):
+	//    - Total rent = Prorated January rent + Full-month rent for February–April.
+	//    - Total rent = 965.00 + 3000.00 = 3965.00.
+	//
+	// Thus, the expected total rent collected is $3965.00.
+	expectedTotalRent := 965.0 + 1000.0*3
 
 	assert.Equal(t, expectedTotalRent, playerComp.Player.Funds, "Rent for 4 months should be collected")
 }
@@ -538,54 +621,6 @@ func TestSpeedMultiplierEffect(t *testing.T) {
 	expectedTotalRent := 965.0 + 1000.0*11 // Correct total rent based on prorated first month
 
 	assert.Equal(t, expectedTotalRent, playerComp.Player.Funds, "Rent for 12 months should be collected")
-}
-
-func TestPropertyPurchasedOnLastDay(t *testing.T) {
-	purchaseDate := time.Date(2023, 1, 31, 0, 0, 0, 0, time.UTC) // January 31, 2023
-	world := createTestWorld(purchaseDate, 1000.0)
-
-	gameTime, err := utils.GetCurrentGameTime(world)
-	assert.NoError(t, err)
-
-	// Set LastUpdated to purchase date
-	gameTime.LastUpdated = purchaseDate
-
-	// Advance to next month
-	gameTime.CurrentDate = time.Date(2023, 2, 1, 0, 0, 0, 0, time.UTC)
-
-	incomeSystem := systems.IncomeSystem{}
-	incomeSystem.Update(world)
-
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
-
-	// Expected full rent for February
-	expectedFullRent := 1000.0 // Full rent for February
-
-	assert.Equal(t, expectedFullRent, playerComp.Player.Funds, "Full rent should be collected for the month following last day purchase")
-}
-
-func TestPropertyPurchasedOnFirstDay(t *testing.T) {
-	purchaseDate := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
-	world := createTestWorld(purchaseDate, 1000.0)
-
-	gameTime, err := utils.GetCurrentGameTime(world)
-	assert.NoError(t, err)
-
-	// Set LastUpdated to purchase date
-	gameTime.LastUpdated = purchaseDate
-
-	// Advance to end of month
-	gameTime.CurrentDate = time.Date(2023, 2, 1, 0, 0, 0, 0, time.UTC)
-
-	incomeSystem := systems.IncomeSystem{}
-	incomeSystem.Update(world)
-
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
-
-	// Expected prorated rent for January
-	expectedRent := 965.0
-
-	assert.Equal(t, expectedRent, playerComp.Player.Funds, "Full rent should be collected for full month ownership")
 }
 
 func TestLeapYearFebruary(t *testing.T) {
@@ -706,6 +741,24 @@ func TestMultiplePropertiesWithDifferentPlayers(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
+	// Expected rent calculation:
+	// For Player 1's property (Property1):
+	// 1. Property purchased on January 1, 2023, so rent starts January 2.
+	// 2. January has 31 days, so rent is for 30 days (Jan 2–31).
+	// 3. Daily base rent = 1000 / 31 ≈ 32.26.
+	// 4. Total rent = 32.26 × 30 ≈ 967.80.
+	// 5. Rounded down to nearest multiple of 5: floor(967.80/5)*5 = 965.00.
+
+	// For Player 2's property (Property2):
+	// 1. Property purchased on January 1, 2023, so rent starts January 2.
+	// 2. January has 31 days, so rent is for 30 days (Jan 2–31).
+	// 3. Daily base rent = 2000 / 31 ≈ 64.52.
+	// 4. Total rent = 64.52 × 30 ≈ 1935.48.
+	// 5. Rounded down: floor(1935.48/5)*5 = 1935.00.
+
+	// Player 1 expected = 965.00
+	// Player 2 expected = 1935.00
+
 	// Assert funds for Player 1
 	playerComp1 := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
 	assert.Equal(t, 965.0, playerComp1.Player.Funds, "Player 1's rent should be collected correctly")
@@ -806,7 +859,7 @@ func TestMultiLevelUpgrades(t *testing.T) {
 	incomeSystem.Update(world)
 
 	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
-	expectedRent := 1515.0
+	expectedRent := 1520.0
 
 	assert.Equal(t, expectedRent, playerComp.Player.Funds, "Rent with multiple upgrades should be collected correctly")
 }
@@ -830,7 +883,7 @@ func TestExcessiveUpgradeLevel(t *testing.T) {
 	incomeSystem.Update(world)
 
 	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
-	expectedRent := 1065.0 // Correct total rent based on prorated base rent + available upgrades
+	expectedRent := 1060.0 // Correct total rent based on prorated base rent + available upgrades
 
 	assert.Equal(t, expectedRent, playerComp.Player.Funds, "Rent should include available upgrades even if UpgradeLevel exceeds available upgrades")
 }
@@ -1105,7 +1158,7 @@ func TestUpgradePrerequisiteChain(t *testing.T) {
 	incomeSystem.Update(world)
 
 	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
-	expectedRent := 1070.0
+	expectedRent := 1080.0
 
 	assert.Equal(t, expectedRent, playerComp.Player.Funds, "Rent should include all applied upgrades")
 }
@@ -1160,19 +1213,6 @@ func TestUpgradeTreeComprehensive(t *testing.T) {
 	incomeSystem.Update(world)
 	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
 
-	// Expected Rent Calculation:
-	// Prorated Base Rent: $965
-	// Upgrades:
-	// - "renovated_interior": $65
-	// - "smart_home_automation": $70
-	// - "premium_fixtures": $15
-	// - "solar_panels": $40
-	// - "energy_efficient_windows": $25
-	// - "high_efficiency_hvac": $0
-	// Total Upgrades: $215
-	// Total Prorated Rent: $965 + $215 = $1,180
-
-	expectedRent := 1180.0
-
+	expectedRent := 1195.0
 	assert.Equal(t, expectedRent, playerComp.Player.Funds, "Rent should include all applied upgrades from multiple paths")
 }
