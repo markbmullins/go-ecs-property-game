@@ -172,7 +172,7 @@ func handleUpgradeProperty(world *ecs.World, payload interface{}, w http.Respons
 		return
 	}
 
-	currentLevel := propComp.Property.UpgradeLevel
+	currentLevel := len(propComp.Property.Upgrades)
 
 	// Check if the current level is below the maximum for the upgrade path
 	if currentLevel >= len(upgradePath)-1 {
@@ -232,9 +232,6 @@ func handleUpgradeProperty(world *ecs.World, payload interface{}, w http.Respons
 	// Append the new upgrade to the Upgrades slice
 	propComp.Property.Upgrades = append(propComp.Property.Upgrades, newUpgrade)
 
-	// Increment the UpgradeLevel
-	propComp.Property.UpgradeLevel++
-
 	// Optionally, handle concurrency or lock the property during upgrade
 	// For example, prevent further upgrades until this one completes
 	// This depends on your game design requirements
@@ -242,7 +239,7 @@ func handleUpgradeProperty(world *ecs.World, payload interface{}, w http.Respons
 	// Send success response
 	responseData := map[string]interface{}{
 		"property_id":      propertyID,
-		"upgrade_level":    propComp.Property.UpgradeLevel,
+		"upgrade_level":    len(propComp.Property.Upgrades),
 		"purchase_date":    purchaseDate.Format("2006-01-02"),
 		"rent_increase":    nextUpgrade.RentIncrease,
 		"days_to_complete": nextUpgrade.DaysToComplete,

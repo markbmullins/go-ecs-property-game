@@ -138,7 +138,7 @@ func calculateMonthlyRent(property *models.Property, monthStart, monthEnd time.T
 	propertyRentDays := countDaysInRange(propertyRentStartDate, monthEnd)
 
 	// Calculate daily base rent by dividing the base rent by the total days in the month.
-	baseDailyRent := property.BaseRent / daysInCurrentMonth
+	baseDailyRent := (property.BaseRent + property.RentBoost)/ daysInCurrentMonth
 
 	totalBaseRent := (baseDailyRent * float64(propertyRentDays))
 

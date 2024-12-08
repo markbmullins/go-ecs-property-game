@@ -22,7 +22,7 @@ func GetHistoricHeightsNeighborhood() *models.Neighborhood {
 		PropertyIDs:          propertyIDs,
 		AveragePropertyValue: 180000.0,
 		RentBoostThreshold:   60.0, // 60% of properties need to be upgraded
-		RentBoostAmount:      12.0, // 12% rent boost
+		RentBoostPercent:      12.0, // 12% rent boost
 	}
 }
 
@@ -41,7 +41,6 @@ var HistoricResidential = []models.Property{
 		BaseRent:                     2500.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicResidentialUpgradePaths(),
 		Price:                        500000.0,
@@ -51,7 +50,6 @@ var HistoricResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           22,
@@ -63,7 +61,6 @@ var HistoricResidential = []models.Property{
 		BaseRent:                     3000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicResidentialUpgradePaths(),
 		Price:                        600000.0,
@@ -73,7 +70,6 @@ var HistoricResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           23,
@@ -85,7 +81,6 @@ var HistoricResidential = []models.Property{
 		BaseRent:                     2800.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicResidentialUpgradePaths(),
 		Price:                        580000.0,
@@ -95,7 +90,6 @@ var HistoricResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           24,
@@ -107,7 +101,6 @@ var HistoricResidential = []models.Property{
 		BaseRent:                     3200.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicResidentialUpgradePaths(),
 		Price:                        700000.0,
@@ -117,7 +110,6 @@ var HistoricResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           25,
@@ -129,7 +121,6 @@ var HistoricResidential = []models.Property{
 		BaseRent:                     2900.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicResidentialUpgradePaths(),
 		Price:                        580000.0,
@@ -139,7 +130,6 @@ var HistoricResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           26,
@@ -151,7 +141,6 @@ var HistoricResidential = []models.Property{
 		BaseRent:                     3100.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicResidentialUpgradePaths(),
 		Price:                        620000.0,
@@ -161,7 +150,6 @@ var HistoricResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           27,
@@ -173,7 +161,6 @@ var HistoricResidential = []models.Property{
 		BaseRent:                     3400.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicResidentialUpgradePaths(),
 		Price:                        750000.0,
@@ -183,7 +170,6 @@ var HistoricResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           28,
@@ -195,7 +181,6 @@ var HistoricResidential = []models.Property{
 		BaseRent:                     3600.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicResidentialUpgradePaths(),
 		Price:                        760000.0,
@@ -205,7 +190,6 @@ var HistoricResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           29,
@@ -217,7 +201,6 @@ var HistoricResidential = []models.Property{
 		BaseRent:                     3300.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicResidentialUpgradePaths(),
 		Price:                        700000.0,
@@ -227,7 +210,6 @@ var HistoricResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           30,
@@ -239,7 +221,6 @@ var HistoricResidential = []models.Property{
 		BaseRent:                     3300.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicResidentialUpgradePaths(),
 		Price:                        750000.0,
@@ -249,7 +230,6 @@ var HistoricResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 }
 
@@ -264,7 +244,6 @@ var HistoricCommercial = []models.Property{
 		BaseRent:                     7000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicCommercialUpgradePaths(),
 		Price:                        1800000.0,
@@ -274,7 +253,6 @@ var HistoricCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           32,
@@ -286,7 +264,6 @@ var HistoricCommercial = []models.Property{
 		BaseRent:                     5000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicCommercialUpgradePaths(),
 		Price:                        1200000.0,
@@ -296,7 +273,6 @@ var HistoricCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           33,
@@ -308,7 +284,6 @@ var HistoricCommercial = []models.Property{
 		BaseRent:                     10000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicCommercialUpgradePaths(),
 		Price:                        2500000.0,
@@ -318,7 +293,6 @@ var HistoricCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           34,
@@ -330,7 +304,6 @@ var HistoricCommercial = []models.Property{
 		BaseRent:                     6000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicCommercialUpgradePaths(),
 		Price:                        1400000.0,
@@ -340,7 +313,6 @@ var HistoricCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           35,
@@ -352,7 +324,6 @@ var HistoricCommercial = []models.Property{
 		BaseRent:                     9000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicCommercialUpgradePaths(),
 		Price:                        2200000.0,
@@ -362,7 +333,6 @@ var HistoricCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           36,
@@ -374,7 +344,6 @@ var HistoricCommercial = []models.Property{
 		BaseRent:                     15000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicCommercialUpgradePaths(),
 		Price:                        5000000.0,
@@ -384,7 +353,6 @@ var HistoricCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           37,
@@ -396,7 +364,6 @@ var HistoricCommercial = []models.Property{
 		BaseRent:                     12000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicCommercialUpgradePaths(),
 		Price:                        3000000.0,
@@ -406,7 +373,6 @@ var HistoricCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           38,
@@ -418,7 +384,6 @@ var HistoricCommercial = []models.Property{
 		BaseRent:                     8000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicCommercialUpgradePaths(),
 		Price:                        2000000.0,
@@ -428,7 +393,6 @@ var HistoricCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           39,
@@ -440,7 +404,6 @@ var HistoricCommercial = []models.Property{
 		BaseRent:                     18000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicCommercialUpgradePaths(),
 		Price:                        4500000.0,
@@ -450,7 +413,6 @@ var HistoricCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           40,
@@ -462,7 +424,6 @@ var HistoricCommercial = []models.Property{
 		BaseRent:                     10000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 historicCommercialUpgradePaths(),
 		Price:                        2500000.0,
@@ -472,7 +433,6 @@ var HistoricCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               2,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 }
 

@@ -22,7 +22,7 @@ func GetWillowFlatsNeighborhood() *models.Neighborhood {
 		PropertyIDs:          propertyIDs,
 		AveragePropertyValue: 0.0,
 		RentBoostThreshold:   65.0, // 65% of properties need to be upgraded
-		RentBoostAmount:      20.0, // 20% rent boost
+		RentBoostPercent:      20.0, // 20% rent boost
 	}
 }
 
@@ -41,7 +41,6 @@ var WillowResidential = []models.Property{
 		BaseRent:                     900.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowResidentialUpgradePaths(),
 		Price:                        150000.0,
@@ -51,7 +50,6 @@ var WillowResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           82,
@@ -63,7 +61,6 @@ var WillowResidential = []models.Property{
 		BaseRent:                     850.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowResidentialUpgradePaths(),
 		Price:                        140000.0,
@@ -73,7 +70,6 @@ var WillowResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           83,
@@ -85,7 +81,6 @@ var WillowResidential = []models.Property{
 		BaseRent:                     920.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowResidentialUpgradePaths(),
 		Price:                        155000.0,
@@ -95,7 +90,6 @@ var WillowResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           84,
@@ -107,7 +101,6 @@ var WillowResidential = []models.Property{
 		BaseRent:                     880.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowResidentialUpgradePaths(),
 		Price:                        145000.0,
@@ -117,7 +110,6 @@ var WillowResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           85,
@@ -129,7 +121,6 @@ var WillowResidential = []models.Property{
 		BaseRent:                     910.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowResidentialUpgradePaths(),
 		Price:                        150000.0,
@@ -139,7 +130,6 @@ var WillowResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           86,
@@ -151,7 +141,6 @@ var WillowResidential = []models.Property{
 		BaseRent:                     870.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowResidentialUpgradePaths(),
 		Price:                        142000.0,
@@ -161,7 +150,6 @@ var WillowResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           87,
@@ -173,7 +161,6 @@ var WillowResidential = []models.Property{
 		BaseRent:                     930.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowResidentialUpgradePaths(),
 		Price:                        160000.0,
@@ -183,7 +170,6 @@ var WillowResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           88,
@@ -195,7 +181,6 @@ var WillowResidential = []models.Property{
 		BaseRent:                     890.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowResidentialUpgradePaths(),
 		Price:                        148000.0,
@@ -205,7 +190,6 @@ var WillowResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           89,
@@ -217,7 +201,6 @@ var WillowResidential = []models.Property{
 		BaseRent:                     940.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowResidentialUpgradePaths(),
 		Price:                        165000.0,
@@ -227,7 +210,6 @@ var WillowResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           90,
@@ -239,7 +221,6 @@ var WillowResidential = []models.Property{
 		BaseRent:                     860.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowResidentialUpgradePaths(),
 		Price:                        143000.0,
@@ -249,7 +230,6 @@ var WillowResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 }
 
@@ -264,7 +244,6 @@ var WillowCommercial = []models.Property{
 		BaseRent:                     3000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowCommercialUpgradePaths(),
 		Price:                        700000.0,
@@ -274,7 +253,6 @@ var WillowCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           92,
@@ -286,7 +264,6 @@ var WillowCommercial = []models.Property{
 		BaseRent:                     3500.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowCommercialUpgradePaths(),
 		Price:                        800000.0,
@@ -296,7 +273,6 @@ var WillowCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           93,
@@ -308,7 +284,6 @@ var WillowCommercial = []models.Property{
 		BaseRent:                     4000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowCommercialUpgradePaths(),
 		Price:                        900000.0,
@@ -318,7 +293,6 @@ var WillowCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           94,
@@ -330,7 +304,6 @@ var WillowCommercial = []models.Property{
 		BaseRent:                     3800.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowCommercialUpgradePaths(),
 		Price:                        850000.0,
@@ -340,7 +313,6 @@ var WillowCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           95,
@@ -352,7 +324,6 @@ var WillowCommercial = []models.Property{
 		BaseRent:                     3200.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowCommercialUpgradePaths(),
 		Price:                        750000.0,
@@ -362,7 +333,6 @@ var WillowCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           96,
@@ -374,7 +344,6 @@ var WillowCommercial = []models.Property{
 		BaseRent:                     4500.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowCommercialUpgradePaths(),
 		Price:                        950000.0,
@@ -384,7 +353,6 @@ var WillowCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           97,
@@ -396,7 +364,6 @@ var WillowCommercial = []models.Property{
 		BaseRent:                     3600.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowCommercialUpgradePaths(),
 		Price:                        820000.0,
@@ -406,7 +373,6 @@ var WillowCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           98,
@@ -418,7 +384,6 @@ var WillowCommercial = []models.Property{
 		BaseRent:                     4200.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowCommercialUpgradePaths(),
 		Price:                        880000.0,
@@ -428,7 +393,6 @@ var WillowCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           99,
@@ -440,7 +404,6 @@ var WillowCommercial = []models.Property{
 		BaseRent:                     3900.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowCommercialUpgradePaths(),
 		Price:                        840000.0,
@@ -450,7 +413,6 @@ var WillowCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           100,
@@ -462,7 +424,6 @@ var WillowCommercial = []models.Property{
 		BaseRent:                     3300.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 willowCommercialUpgradePaths(),
 		Price:                        770000.0,
@@ -472,7 +433,6 @@ var WillowCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               5,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 }
 

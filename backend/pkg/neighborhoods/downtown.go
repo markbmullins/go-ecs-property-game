@@ -22,7 +22,7 @@ func GetDowntownDistrictNeighborhood() *models.Neighborhood {
 		PropertyIDs:          propertyIDs,
 		AveragePropertyValue: 0.0,
 		RentBoostThreshold:   50.0, // 50% of properties need to be upgraded
-		RentBoostAmount:      10.0, // 10% rent boost
+		RentBoostPercent:      10.0, // 10% rent boost
 	}
 }
 
@@ -41,7 +41,6 @@ var DowntownResidential = []models.Property{
 		BaseRent:                     3500.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownResidentialUpgradePaths(),
 		Price:                        750000.0,
@@ -51,7 +50,6 @@ var DowntownResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           2,
@@ -63,7 +61,6 @@ var DowntownResidential = []models.Property{
 		BaseRent:                     5000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownResidentialUpgradePaths(),
 		Price:                        1500000.0,
@@ -73,7 +70,6 @@ var DowntownResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           3,
@@ -85,7 +81,6 @@ var DowntownResidential = []models.Property{
 		BaseRent:                     3200.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownResidentialUpgradePaths(),
 		Price:                        680000.0,
@@ -95,7 +90,6 @@ var DowntownResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           4,
@@ -107,7 +101,6 @@ var DowntownResidential = []models.Property{
 		BaseRent:                     3400.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownResidentialUpgradePaths(),
 		Price:                        720000.0,
@@ -117,7 +110,6 @@ var DowntownResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           5,
@@ -129,7 +121,6 @@ var DowntownResidential = []models.Property{
 		BaseRent:                     4000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownResidentialUpgradePaths(),
 		Price:                        900000.0,
@@ -139,7 +130,6 @@ var DowntownResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           6,
@@ -151,7 +141,6 @@ var DowntownResidential = []models.Property{
 		BaseRent:                     3100.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownResidentialUpgradePaths(),
 		Price:                        690000.0,
@@ -161,7 +150,6 @@ var DowntownResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           7,
@@ -173,7 +161,6 @@ var DowntownResidential = []models.Property{
 		BaseRent:                     3600.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownResidentialUpgradePaths(),
 		Price:                        800000.0,
@@ -183,7 +170,6 @@ var DowntownResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           8,
@@ -195,7 +181,6 @@ var DowntownResidential = []models.Property{
 		BaseRent:                     3800.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownResidentialUpgradePaths(),
 		Price:                        850000.0,
@@ -205,7 +190,6 @@ var DowntownResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           9,
@@ -217,7 +201,6 @@ var DowntownResidential = []models.Property{
 		BaseRent:                     4200.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownResidentialUpgradePaths(),
 		Price:                        950000.0,
@@ -227,7 +210,6 @@ var DowntownResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           10,
@@ -239,7 +221,6 @@ var DowntownResidential = []models.Property{
 		BaseRent:                     3700.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownResidentialUpgradePaths(),
 		Price:                        820000.0,
@@ -249,7 +230,6 @@ var DowntownResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 }
 
@@ -264,7 +244,6 @@ var DowntownCommercial = []models.Property{
 		BaseRent:                     12000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownCommercialUpgradePaths(),
 		Price:                        3000000.0,
@@ -274,7 +253,6 @@ var DowntownCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           12,
@@ -286,7 +264,6 @@ var DowntownCommercial = []models.Property{
 		BaseRent:                     8000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownCommercialUpgradePaths(),
 		Price:                        2000000.0,
@@ -296,7 +273,6 @@ var DowntownCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           13,
@@ -308,7 +284,6 @@ var DowntownCommercial = []models.Property{
 		BaseRent:                     7000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownCommercialUpgradePaths(),
 		Price:                        1800000.0,
@@ -318,7 +293,6 @@ var DowntownCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           14,
@@ -330,7 +304,6 @@ var DowntownCommercial = []models.Property{
 		BaseRent:                     9000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownCommercialUpgradePaths(),
 		Price:                        2200000.0,
@@ -340,7 +313,6 @@ var DowntownCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           15,
@@ -352,7 +324,6 @@ var DowntownCommercial = []models.Property{
 		BaseRent:                     6500.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownCommercialUpgradePaths(),
 		Price:                        1600000.0,
@@ -362,7 +333,6 @@ var DowntownCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           16,
@@ -374,7 +344,6 @@ var DowntownCommercial = []models.Property{
 		BaseRent:                     25000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownCommercialUpgradePaths(),
 		Price:                        7000000.0,
@@ -384,7 +353,6 @@ var DowntownCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           17,
@@ -396,7 +364,6 @@ var DowntownCommercial = []models.Property{
 		BaseRent:                     8000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownCommercialUpgradePaths(),
 		Price:                        2000000.0,
@@ -406,7 +373,6 @@ var DowntownCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           18,
@@ -418,7 +384,6 @@ var DowntownCommercial = []models.Property{
 		BaseRent:                     15000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownCommercialUpgradePaths(),
 		Price:                        5000000.0,
@@ -428,7 +393,6 @@ var DowntownCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           19,
@@ -440,7 +404,6 @@ var DowntownCommercial = []models.Property{
 		BaseRent:                     12000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownCommercialUpgradePaths(),
 		Price:                        3000000.0,
@@ -450,7 +413,6 @@ var DowntownCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           20,
@@ -462,7 +424,6 @@ var DowntownCommercial = []models.Property{
 		BaseRent:                     7500.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 downtownCommercialUpgradePaths(),
 		Price:                        1600000.0,
@@ -472,7 +433,6 @@ var DowntownCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               1,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 }
 

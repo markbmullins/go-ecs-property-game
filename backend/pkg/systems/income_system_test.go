@@ -72,7 +72,6 @@ func applyUpgrade(world *ecs.World, propertyID int, upgradeID string, currentDat
 	appliedUpgrade := *targetUpgrade // Create a copy
 	appliedUpgrade.PurchaseDate = currentDate
 	property.Upgrades = append(property.Upgrades, appliedUpgrade)
-	property.UpgradeLevel++
 
 	fmt.Printf("Applied upgrade '%s' to property '%s'\n", upgradeID, property.Name)
 	return true
@@ -185,7 +184,6 @@ func createTestWorldWithUpgrades(purchaseDate time.Time, baseRent float64) *ecs.
 		PlayerID:     1,
 		PurchaseDate: purchaseDate,
 		ProrateRent:  true,
-		UpgradeLevel: 0,
 		Upgrades:     []models.Upgrade{},
 		UpgradePaths: map[string][]models.Upgrade{
 			"Luxury": {renovatedInterior, smartHomeAutomation, premiumFixtures},
@@ -258,7 +256,6 @@ func createTestWorldWithCircularUpgrades(purchaseDate time.Time, baseRent float6
 		PlayerID:     1,
 		PurchaseDate: purchaseDate,
 		ProrateRent:  true,
-		UpgradeLevel: 0,
 		Upgrades:     []models.Upgrade{},
 		UpgradePaths: map[string][]models.Upgrade{
 			"CircularPath": {upgradeA, upgradeB},
@@ -338,7 +335,6 @@ func createTestWorldWithUpgradeChain(purchaseDate time.Time, baseRent float64) *
 		PlayerID:     1,
 		PurchaseDate: purchaseDate,
 		ProrateRent:  true,
-		UpgradeLevel: 0,
 		Upgrades:     []models.Upgrade{},
 		UpgradePaths: map[string][]models.Upgrade{
 			"ChainPath": {upgradedInterior, upgrade2, upgrade3},
@@ -449,7 +445,6 @@ func createTestWorldWithUpgradeTree(purchaseDate time.Time, baseRent float64) *e
 		PlayerID:     1,
 		PurchaseDate: purchaseDate,
 		ProrateRent:  true,
-		UpgradeLevel: 0,
 		Upgrades:     []models.Upgrade{},
 		UpgradePaths: map[string][]models.Upgrade{
 			"Luxury":     {renovatedInterior, smartHomeAutomation, premiumFixtures},
@@ -775,7 +770,6 @@ func TestRentWithPropertyUpgrade(t *testing.T) {
 
 	// Configure Property Upgrades
 	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	propertyComp.Property.UpgradeLevel = 1
 	propertyComp.Property.Upgrades = []models.Upgrade{
 		{RentIncrease: 200.0}, // Level 1
 	}
@@ -807,7 +801,6 @@ func TestProratedRentWithUpgrade(t *testing.T) {
 
 	// Configure Property Upgrades
 	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	propertyComp.Property.UpgradeLevel = 1
 	propertyComp.Property.Upgrades = []models.Upgrade{
 		{
 			RentIncrease:   200.0,
@@ -844,7 +837,6 @@ func TestMultiLevelUpgrades(t *testing.T) {
 
 	// Configure Property with multiple upgrade levels
 	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	propertyComp.Property.UpgradeLevel = 3
 	propertyComp.Property.Upgrades = []models.Upgrade{
 		{RentIncrease: 100.0, DaysToComplete: 0, PurchaseDate: purchaseDate},                  // Level 1
 		{RentIncrease: 200.0, DaysToComplete: 0, PurchaseDate: purchaseDate.AddDate(0, 0, 1)}, // Level 2
@@ -870,7 +862,6 @@ func TestExcessiveUpgradeLevel(t *testing.T) {
 
 	// Configure Property with an out-of-bounds upgrade level
 	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	propertyComp.Property.UpgradeLevel = 10 // Level higher than available upgrades
 	propertyComp.Property.Upgrades = []models.Upgrade{
 		{RentIncrease: 100.0}, // Level 1
 	}
@@ -1020,7 +1011,7 @@ func TestUpgradePrerequisiteEnforcement(t *testing.T) {
 
 	// Verify that UpgradeLevel remains 0
 	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	assert.Equal(t, 0, propertyComp.Property.UpgradeLevel, "Upgrade level should remain 0 when prerequisites are not met")
+	assert.Equal(t, 0, len(propertyComp.Property.Upgrades), "Upgrade level should remain 0 when prerequisites are not met")
 }
 
 func TestUpgradeApplicationOrder(t *testing.T) {
@@ -1046,7 +1037,7 @@ func TestUpgradeApplicationOrder(t *testing.T) {
 
 	// Verify that UpgradeLevel is 3
 	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	assert.Equal(t, 3, propertyComp.Property.UpgradeLevel, "Upgrade level should be 3 after applying three upgrades")
+	assert.Equal(t, 3, len(propertyComp.Property.Upgrades), "Upgrade level should be 3 after applying three upgrades")
 }
 
 func TestUpgradePathIndependence(t *testing.T) {
@@ -1073,7 +1064,7 @@ func TestUpgradePathIndependence(t *testing.T) {
 
 	// Verify that UpgradeLevel reflects all applied upgrades
 	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	assert.Equal(t, 3, propertyComp.Property.UpgradeLevel, "Upgrade level should be 3 after applying three independent upgrades")
+	assert.Equal(t, 3, len(propertyComp.Property.Upgrades), "Upgrade level should be 3 after applying three independent upgrades")
 }
 
 func TestUpgradeCompletionTiming(t *testing.T) {
@@ -1116,7 +1107,7 @@ func TestCircularUpgradePrerequisites(t *testing.T) {
 
 	// Verify that no upgrades have been applied
 	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	assert.Equal(t, 0, propertyComp.Property.UpgradeLevel, "No upgrades should be applied due to circular prerequisites")
+	assert.Equal(t, 0, len(propertyComp.Property.Upgrades), "No upgrades should be applied due to circular prerequisites")
 }
 
 func TestUpgradePrerequisiteChain(t *testing.T) {
@@ -1146,7 +1137,7 @@ func TestUpgradePrerequisiteChain(t *testing.T) {
 
 	// Verify that UpgradeLevel is 3
 	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	assert.Equal(t, 3, propertyComp.Property.UpgradeLevel, "Upgrade level should be 3 after applying three upgrades")
+	assert.Equal(t, 3, len(propertyComp.Property.Upgrades), "Upgrade level should be 3 after applying three upgrades")
 
 	// Advance to February 1, 2023 and collect rent
 	gameTime, err := utils.GetCurrentGameTime(world)
@@ -1201,7 +1192,7 @@ func TestUpgradeTreeComprehensive(t *testing.T) {
 
 	// Verify that UpgradeLevel is 6
 	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	assert.Equal(t, 6, propertyComp.Property.UpgradeLevel, "Upgrade level should be 6 after applying six upgrades")
+	assert.Equal(t, 6, len(propertyComp.Property.Upgrades), "Upgrade level should be 6 after applying six upgrades")
 
 	// Advance to February 1, 2023 and collect rent
 	gameTime, err := utils.GetCurrentGameTime(world)

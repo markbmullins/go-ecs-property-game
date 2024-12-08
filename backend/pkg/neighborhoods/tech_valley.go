@@ -21,7 +21,7 @@ func GetTechValleyNeighborhood() *models.Neighborhood {
 		PropertyIDs:          propertyIDs,
 		AveragePropertyValue: 0.0,
 		RentBoostThreshold:   55.0, // 55% of properties need to be upgraded
-		RentBoostAmount:      15.0, // 15% rent boost
+		RentBoostPercent:      15.0, // 15% rent boost
 	}
 }
 
@@ -40,7 +40,6 @@ var TechResidential = []models.Property{
 		BaseRent:                     3200.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techResidentialUpgradePaths(),
 		Price:                        700000.0,
@@ -50,7 +49,6 @@ var TechResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           42,
@@ -62,7 +60,6 @@ var TechResidential = []models.Property{
 		BaseRent:                     4000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techResidentialUpgradePaths(),
 		Price:                        1200000.0,
@@ -72,7 +69,6 @@ var TechResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           43,
@@ -84,7 +80,6 @@ var TechResidential = []models.Property{
 		BaseRent:                     3500.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techResidentialUpgradePaths(),
 		Price:                        900000.0,
@@ -94,7 +89,6 @@ var TechResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           44,
@@ -106,7 +100,6 @@ var TechResidential = []models.Property{
 		BaseRent:                     3800.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techResidentialUpgradePaths(),
 		Price:                        1150000.0,
@@ -116,7 +109,6 @@ var TechResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           45,
@@ -128,7 +120,6 @@ var TechResidential = []models.Property{
 		BaseRent:                     2900.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techResidentialUpgradePaths(),
 		Price:                        680000.0,
@@ -138,7 +129,6 @@ var TechResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           46,
@@ -150,7 +140,6 @@ var TechResidential = []models.Property{
 		BaseRent:                     3300.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techResidentialUpgradePaths(),
 		Price:                        800000.0,
@@ -160,7 +149,6 @@ var TechResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           47,
@@ -172,7 +160,6 @@ var TechResidential = []models.Property{
 		BaseRent:                     3600.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techResidentialUpgradePaths(),
 		Price:                        850000.0,
@@ -182,7 +169,6 @@ var TechResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           48,
@@ -194,7 +180,6 @@ var TechResidential = []models.Property{
 		BaseRent:                     4000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techResidentialUpgradePaths(),
 		Price:                        1000000.0,
@@ -204,7 +189,6 @@ var TechResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           49,
@@ -216,7 +200,6 @@ var TechResidential = []models.Property{
 		BaseRent:                     4400.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techResidentialUpgradePaths(),
 		Price:                        1400000.0,
@@ -226,7 +209,6 @@ var TechResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           50,
@@ -238,7 +220,6 @@ var TechResidential = []models.Property{
 		BaseRent:                     4400.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techResidentialUpgradePaths(),
 		Price:                        1400000.0,
@@ -248,7 +229,6 @@ var TechResidential = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  true,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 }
 
@@ -263,7 +243,6 @@ var TechCommercial = []models.Property{
 		BaseRent:                     13000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techCommercialUpgradePaths(),
 		Price:                        3500000.0,
@@ -273,7 +252,6 @@ var TechCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           52,
@@ -285,7 +263,6 @@ var TechCommercial = []models.Property{
 		BaseRent:                     6000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techCommercialUpgradePaths(),
 		Price:                        1600000.0,
@@ -295,7 +272,6 @@ var TechCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           53,
@@ -307,7 +283,6 @@ var TechCommercial = []models.Property{
 		BaseRent:                     11000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techCommercialUpgradePaths(),
 		Price:                        3200000.0,
@@ -317,7 +292,6 @@ var TechCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           54,
@@ -329,7 +303,6 @@ var TechCommercial = []models.Property{
 		BaseRent:                     9000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techCommercialUpgradePaths(),
 		Price:                        2000000.0,
@@ -339,7 +312,6 @@ var TechCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           55,
@@ -351,7 +323,6 @@ var TechCommercial = []models.Property{
 		BaseRent:                     14000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techCommercialUpgradePaths(),
 		Price:                        4000000.0,
@@ -361,7 +332,6 @@ var TechCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           56,
@@ -373,7 +343,6 @@ var TechCommercial = []models.Property{
 		BaseRent:                     10000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techCommercialUpgradePaths(),
 		Price:                        2500000.0,
@@ -383,7 +352,6 @@ var TechCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           57,
@@ -395,7 +363,6 @@ var TechCommercial = []models.Property{
 		BaseRent:                     13000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techCommercialUpgradePaths(),
 		Price:                        3500000.0,
@@ -405,7 +372,6 @@ var TechCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           58,
@@ -417,7 +383,6 @@ var TechCommercial = []models.Property{
 		BaseRent:                     25000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techCommercialUpgradePaths(),
 		Price:                        7000000.0,
@@ -427,7 +392,6 @@ var TechCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           59,
@@ -439,7 +403,6 @@ var TechCommercial = []models.Property{
 		BaseRent:                     20000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techCommercialUpgradePaths(),
 		Price:                        6000000.0,
@@ -449,7 +412,6 @@ var TechCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                           60,
@@ -461,7 +423,6 @@ var TechCommercial = []models.Property{
 		BaseRent:                     25000.0,
 		RentBoost:                    0.0,
 		Owned:                        false,
-		UpgradeLevel:                 0,
 		Upgrades:                     []models.Upgrade{},
 		UpgradePaths:                 techCommercialUpgradePaths(),
 		Price:                        7000000.0,
@@ -471,7 +432,6 @@ var TechCommercial = []models.Property{
 		PurchaseDate:                 time.Time{},
 		ProrateRent:                  false,
 		NeighborhoodID:               3,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 }
 

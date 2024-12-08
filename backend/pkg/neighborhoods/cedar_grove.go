@@ -22,7 +22,7 @@ func GetCedarGroveNeighborhood() *models.Neighborhood {
 		PropertyIDs:          propertyIDs,
 		AveragePropertyValue: 0.0,
 		RentBoostThreshold:   50.0, // 50% of properties need to be upgraded
-		RentBoostAmount:      10.0, // 10% rent boost
+		RentBoostPercent:      10.0, // 10% rent boost
 	}
 }
 
@@ -41,7 +41,6 @@ var CedarResidential = []models.Property{
 		BaseRent:                      1800.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarResidentialUpgradePaths(),
 		Price:                         300000.0,
@@ -51,7 +50,6 @@ var CedarResidential = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   true,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            62,
@@ -63,7 +61,6 @@ var CedarResidential = []models.Property{
 		BaseRent:                      2200.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarResidentialUpgradePaths(),
 		Price:                         350000.0,
@@ -73,7 +70,6 @@ var CedarResidential = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   true,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            63,
@@ -85,7 +81,6 @@ var CedarResidential = []models.Property{
 		BaseRent:                      1500.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarResidentialUpgradePaths(),
 		Price:                         260000.0,
@@ -95,7 +90,6 @@ var CedarResidential = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   true,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            64,
@@ -107,7 +101,6 @@ var CedarResidential = []models.Property{
 		BaseRent:                      2000.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarResidentialUpgradePaths(),
 		Price:                         400000.0,
@@ -117,7 +110,6 @@ var CedarResidential = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   true,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            65,
@@ -129,7 +121,6 @@ var CedarResidential = []models.Property{
 		BaseRent:                      1900.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarResidentialUpgradePaths(),
 		Price:                         380000.0,
@@ -139,7 +130,6 @@ var CedarResidential = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   true,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            66,
@@ -151,7 +141,6 @@ var CedarResidential = []models.Property{
 		BaseRent:                      2200.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarResidentialUpgradePaths(),
 		Price:                         420000.0,
@@ -161,7 +150,6 @@ var CedarResidential = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   true,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            67,
@@ -173,7 +161,6 @@ var CedarResidential = []models.Property{
 		BaseRent:                      2100.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarResidentialUpgradePaths(),
 		Price:                         400000.0,
@@ -183,7 +170,6 @@ var CedarResidential = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   true,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            68,
@@ -195,7 +181,6 @@ var CedarResidential = []models.Property{
 		BaseRent:                      1700.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarResidentialUpgradePaths(),
 		Price:                         340000.0,
@@ -205,7 +190,6 @@ var CedarResidential = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   true,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            69,
@@ -217,7 +201,6 @@ var CedarResidential = []models.Property{
 		BaseRent:                      1600.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarResidentialUpgradePaths(),
 		Price:                         330000.0,
@@ -227,7 +210,6 @@ var CedarResidential = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   true,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            70,
@@ -239,7 +221,6 @@ var CedarResidential = []models.Property{
 		BaseRent:                      1500.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarResidentialUpgradePaths(),
 		Price:                         260000.0,
@@ -249,7 +230,6 @@ var CedarResidential = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   true,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 }
 
@@ -264,7 +244,6 @@ var CedarCommercial = []models.Property{
 		BaseRent:                      4000.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarCommercialUpgradePaths(),
 		Price:                         900000.0,
@@ -274,7 +253,6 @@ var CedarCommercial = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   false,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            72,
@@ -286,7 +264,6 @@ var CedarCommercial = []models.Property{
 		BaseRent:                      5000.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarCommercialUpgradePaths(),
 		Price:                         1100000.0,
@@ -296,7 +273,6 @@ var CedarCommercial = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   false,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            73,
@@ -308,7 +284,6 @@ var CedarCommercial = []models.Property{
 		BaseRent:                      6500.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarCommercialUpgradePaths(),
 		Price:                         1400000.0,
@@ -318,7 +293,6 @@ var CedarCommercial = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   false,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            74,
@@ -330,7 +304,6 @@ var CedarCommercial = []models.Property{
 		BaseRent:                      8500.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarCommercialUpgradePaths(),
 		Price:                         1750000.0,
@@ -340,7 +313,6 @@ var CedarCommercial = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   false,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            75,
@@ -352,7 +324,6 @@ var CedarCommercial = []models.Property{
 		BaseRent:                      7500.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarCommercialUpgradePaths(),
 		Price:                         1600000.0,
@@ -362,7 +333,6 @@ var CedarCommercial = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   false,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            76,
@@ -374,7 +344,6 @@ var CedarCommercial = []models.Property{
 		BaseRent:                      8500.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarCommercialUpgradePaths(),
 		Price:                         1750000.0,
@@ -384,7 +353,6 @@ var CedarCommercial = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   false,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            77,
@@ -396,7 +364,6 @@ var CedarCommercial = []models.Property{
 		BaseRent:                      3200.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarCommercialUpgradePaths(),
 		Price:                         750000.0,
@@ -406,7 +373,6 @@ var CedarCommercial = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   false,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            78,
@@ -418,7 +384,6 @@ var CedarCommercial = []models.Property{
 		BaseRent:                      8500.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarCommercialUpgradePaths(),
 		Price:                         1750000.0,
@@ -428,7 +393,6 @@ var CedarCommercial = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   false,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            79,
@@ -440,7 +404,6 @@ var CedarCommercial = []models.Property{
 		BaseRent:                      7500.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarCommercialUpgradePaths(),
 		Price:                         1800000.0,
@@ -450,7 +413,6 @@ var CedarCommercial = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   false,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 	{
 		ID:                            80,
@@ -462,7 +424,6 @@ var CedarCommercial = []models.Property{
 		BaseRent:                      8500.0,
 		RentBoost:                     0.0,
 		Owned:                         false,
-		UpgradeLevel:                  0,
 		Upgrades:                      []models.Upgrade{},
 		UpgradePaths:                  cedarCommercialUpgradePaths(),
 		Price:                         1750000.0,
@@ -472,7 +433,6 @@ var CedarCommercial = []models.Property{
 		PurchaseDate:                  time.Time{},
 		ProrateRent:                   false,
 		NeighborhoodID:                4,
-		UpgradedNeighborhoodRentBoost: 0.0,
 	},
 }
 

@@ -51,9 +51,8 @@ type Property struct {
 	ID                           int
 	Subtype                      PropertySubtype
 	BaseRent                     float64
-	RentBoost                    float64
+	RentBoost                    float64 // Any applied rent boosts e.g. the neighborhood upgrade rent boost
 	Owned                        bool
-	UpgradeLevel                 int
 	Upgrades                     []Upgrade
 	UpgradePaths                 map[string][]Upgrade
 	Price                        float64
@@ -63,7 +62,6 @@ type Property struct {
 	PurchaseDate                 time.Time
 	ProrateRent                  bool
 	NeighborhoodID               int
-	UpgradedNeighborhoodRentBoost float64
 	Description                  string
 	Address                      string
 }

@@ -19,6 +19,7 @@ func (s *NeighborhoodValueSystem) Update(world *ecs.World) {
 		upgradedCount := 0
 		totalProperties := len(neighborhood.PropertyIDs)
 
+		// Calculate the total neighborhood value
 		for _, propID := range neighborhood.PropertyIDs {
 			propertyEntity, found := world.Entities[propID]
 			if !found {
@@ -29,7 +30,7 @@ func (s *NeighborhoodValueSystem) Update(world *ecs.World) {
 			property := propComp.Property
 			totalValue += property.Price
 
-			if property.UpgradeLevel > 0 {
+			if len(property.Upgrades) > 0 {
 				upgradedCount++
 			}
 		}
@@ -46,9 +47,9 @@ func (s *NeighborhoodValueSystem) Update(world *ecs.World) {
 
 				propComp := propertyEntity.GetComponent("PropertyComponent").(*components.PropertyComponent)
 				property := propComp.Property
-				property.RentBoost = neighborhood.RentBoostAmount
+				property.RentBoost = (neighborhood.RentBoostPercent / 100) * property.BaseRent
 				fmt.Printf("Applied rent boost of %.2f%% to property %s in neighborhood %s\n",
-					neighborhood.RentBoostAmount, property.Name, neighborhood.Name)
+					neighborhood.RentBoostPercent, property.Name, neighborhood.Name)
 			}
 		}
 	}
