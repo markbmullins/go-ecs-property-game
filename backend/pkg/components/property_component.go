@@ -46,7 +46,7 @@ const (
 )
 
 type Property struct {
-    Name                         string
+  Name                         string
 	Type                         PropertyType
 	ID                           int
 	Subtype                      PropertySubtype
