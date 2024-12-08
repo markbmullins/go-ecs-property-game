@@ -1,7 +1,7 @@
 package components
 
-import "github.com/markbmullins/city-developer/pkg/models"
-
-type PlayerComponent struct {
-    Player *models.Player
+type Player struct {
+	ID         int
+	Funds      float64
+	Properties []*Property
 }

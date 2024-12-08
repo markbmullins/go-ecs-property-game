@@ -1,4 +1,4 @@
-package models
+package components
 
 type Neighborhood struct {
 	ID                   int

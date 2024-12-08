@@ -6,7 +6,6 @@ import (
 
 	"github.com/markbmullins/city-developer/pkg/components"
 	"github.com/markbmullins/city-developer/pkg/ecs"
-	"github.com/markbmullins/city-developer/pkg/models"
 	"github.com/markbmullins/city-developer/pkg/utils"
 )
 
@@ -112,15 +111,15 @@ func handleBuyProperty(world *ecs.World, payload interface{}, w http.ResponseWri
 		return
 	}
 
-	playerComp := playerEntity.GetComponent("PlayerComponent").(*components.PlayerComponent)
-	propertyComp := propertyEntity.GetComponent("PropertyComponent").(*components.PropertyComponent)
+	player := playerEntity.GetComponent("Player").(*components.Player)
+	property := propertyEntity.GetComponent("Property").(*components.Property)
 
-	if playerComp.Player.Funds >= propertyComp.Property.Price {
-		playerComp.Player.Funds -= propertyComp.Property.Price
-		propertyComp.Property.Owned = true
-		propertyComp.Property.PlayerID = playerID
-		propertyComp.Property.ProrateRent = true
-		propertyComp.Property.PurchaseDate = gameTime.CurrentDate
+	if player.Funds >= property.Price {
+		player.Funds -= property.Price
+		property.Owned = true
+		property.PlayerID = playerID
+		property.ProrateRent = true
+		property.PurchaseDate = gameTime.CurrentDate
 
 		utils.SendResponse(w, "success", "Property purchased successfully", world, http.StatusOK)
 	} else {
@@ -158,21 +157,21 @@ func handleUpgradeProperty(world *ecs.World, payload interface{}, w http.Respons
 		return
 	}
 
-	// Get the PropertyComponent
-	propComp, compExists := propertyEntity.GetComponent("PropertyComponent").(*components.PropertyComponent)
-	if !compExists || propComp == nil {
-		utils.SendResponse(w, "error", "PropertyComponent missing or invalid", nil, http.StatusInternalServerError)
+	// Get the Property
+	property, propertyExists := propertyEntity.GetComponent("Property").(*components.Property)
+	if !propertyExists || property == nil {
+		utils.SendResponse(w, "error", "Property missing or invalid", nil, http.StatusInternalServerError)
 		return
 	}
 
 	// Validate the upgrade path
-	upgradePath, pathValid := propComp.Property.UpgradePaths[pathName]
+	upgradePath, pathValid := property.UpgradePaths[pathName]
 	if !pathValid {
 		utils.SendResponse(w, "error", "Invalid upgrade path", nil, http.StatusBadRequest)
 		return
 	}
 
-	currentLevel := len(propComp.Property.Upgrades)
+	currentLevel := len(property.Upgrades)
 
 	// Check if the current level is below the maximum for the upgrade path
 	if currentLevel >= len(upgradePath)-1 {
@@ -184,28 +183,28 @@ func handleUpgradeProperty(world *ecs.World, payload interface{}, w http.Respons
 	nextUpgrade := upgradePath[currentLevel+1]
 
 	// Retrieve the owner entity
-	ownerEntity := world.GetEntity(propComp.Property.PlayerID)
+	ownerEntity := world.GetEntity(property.PlayerID)
 	ownerFound := ownerEntity != nil
 	if !ownerFound {
 		utils.SendResponse(w, "error", "Owner not found", nil, http.StatusNotFound)
 		return
 	}
 
-	// Get the PlayerComponent
-	ownerComp, ownerCompExists := ownerEntity.GetComponent("PlayerComponent").(*components.PlayerComponent)
-	if !ownerCompExists || ownerComp == nil {
-		utils.SendResponse(w, "error", "PlayerComponent missing or invalid", nil, http.StatusInternalServerError)
+	// Get the Player
+	player, playerExists := ownerEntity.GetComponent("Player").(*components.Player)
+	if !playerExists || player == nil {
+		utils.SendResponse(w, "error", "Player missing or invalid", nil, http.StatusInternalServerError)
 		return
 	}
 
 	// Check if the owner has sufficient funds
-	if ownerComp.Player.Funds < nextUpgrade.Cost {
+	if player.Funds < nextUpgrade.Cost {
 		utils.SendResponse(w, "error", "Insufficient funds for upgrade", nil, http.StatusForbidden)
 		return
 	}
 
 	// Deduct the upgrade cost
-	ownerComp.Player.Funds -= nextUpgrade.Cost
+	player.Funds -= nextUpgrade.Cost
 
 	// Get current game time
 	gameTime, err := utils.GetCurrentGameTime(world)
@@ -218,7 +217,7 @@ func handleUpgradeProperty(world *ecs.World, payload interface{}, w http.Respons
 	purchaseDate := gameTime.CurrentDate
 
 	// Create a new Upgrade instance with PurchaseDate
-	newUpgrade := models.Upgrade{
+	newUpgrade := components.Upgrade{
 		Name:           nextUpgrade.Name,
 		ID:             nextUpgrade.ID,
 		Level:          currentLevel + 1,
@@ -226,11 +225,11 @@ func handleUpgradeProperty(world *ecs.World, payload interface{}, w http.Respons
 		RentIncrease:   nextUpgrade.RentIncrease,
 		DaysToComplete: nextUpgrade.DaysToComplete,
 		PurchaseDate:   purchaseDate,
-		Prerequisite:   getPrerequisiteUpgrade(propComp.Property, currentLevel),
+		Prerequisite:   getPrerequisiteUpgrade(property, currentLevel),
 	}
 
 	// Append the new upgrade to the Upgrades slice
-	propComp.Property.Upgrades = append(propComp.Property.Upgrades, newUpgrade)
+	property.Upgrades = append(property.Upgrades, newUpgrade)
 
 	// Optionally, handle concurrency or lock the property during upgrade
 	// For example, prevent further upgrades until this one completes
@@ -239,7 +238,7 @@ func handleUpgradeProperty(world *ecs.World, payload interface{}, w http.Respons
 	// Send success response
 	responseData := map[string]interface{}{
 		"property_id":      propertyID,
-		"upgrade_level":    len(propComp.Property.Upgrades),
+		"upgrade_level":    len(property.Upgrades),
 		"purchase_date":    purchaseDate.Format("2006-01-02"),
 		"rent_increase":    nextUpgrade.RentIncrease,
 		"days_to_complete": nextUpgrade.DaysToComplete,
@@ -248,7 +247,7 @@ func handleUpgradeProperty(world *ecs.World, payload interface{}, w http.Respons
 }
 
 // getPrerequisiteUpgrade retrieves the prerequisite upgrade based on the current level.
-func getPrerequisiteUpgrade(property *models.Property, currentLevel int) *models.Upgrade {
+func getPrerequisiteUpgrade(property *components.Property, currentLevel int) *components.Upgrade {
 	if currentLevel == 0 {
 		return nil // No prerequisite for first upgrade
 	}
@@ -276,16 +275,16 @@ func handleSellProperty(world *ecs.World, payload interface{}, w http.ResponseWr
 		return
 	}
 
-	propertyComp := propertyEntity.GetComponent("PropertyComponent").(*components.PropertyComponent)
-	ownerEntity := world.GetEntity(propertyComp.Property.PlayerID)
+	property := propertyEntity.GetComponent("Property").(*components.Property)
+	ownerEntity := world.GetEntity(property.PlayerID)
 
 	ownerFound := ownerEntity != nil
-	if ownerFound && propertyComp.Property.Owned {
-		ownerComp := ownerEntity.GetComponent("PlayerComponent").(*components.PlayerComponent)
-		salePrice := propertyComp.Property.Price * 0.8
-		ownerComp.Player.Funds += salePrice
-		propertyComp.Property.Owned = false
-		propertyComp.Property.PlayerID = 0
+	if ownerFound && property.Owned {
+		player := ownerEntity.GetComponent("Player").(*components.Player)
+		salePrice := property.Price * 0.8
+		player.Funds += salePrice
+		property.Owned = false
+		property.PlayerID = 0
 
 		utils.SendResponse(w, "success", "Property sold successfully", world, http.StatusOK)
 	} else {

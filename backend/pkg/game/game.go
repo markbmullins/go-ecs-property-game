@@ -6,7 +6,6 @@ import (
 
 	"github.com/markbmullins/city-developer/pkg/components"
 	"github.com/markbmullins/city-developer/pkg/ecs"
-	"github.com/markbmullins/city-developer/pkg/models"
 	"github.com/markbmullins/city-developer/pkg/neighborhoods"
 	"github.com/markbmullins/city-developer/pkg/systems"
 )
@@ -15,29 +14,25 @@ func InitializeGame() *ecs.World {
 	world := ecs.NewWorld()
 
 	initialDate := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
-	gameTimeModel := &models.GameTime{
+
+	// Add game time as a component to the world
+	timeEntity := ecs.NewEntity(0)
+	timeEntity.AddComponent("GameTime", &components.GameTime{
 		CurrentDate:       initialDate,
 		LastUpdated:       initialDate,
 		IsPaused:          false,
 		SpeedMultiplier:   1.0,
 		RentCollectionDay: 1,
-	}
-
-	// Add game time as a component to the world
-	timeEntity := ecs.NewEntity(0)
-	timeEntity.AddComponent("GameTime", &components.GameTime{
-		Time: gameTimeModel,
 	})
 	world.AddEntity(timeEntity)
 
 	// Create player entity
-	player := &models.Player{ID: 1, Funds: 10000}
 	playerEntity := ecs.NewEntity(1)
-	playerEntity.AddComponent("PlayerComponent", &components.PlayerComponent{Player: player})
+	playerEntity.AddComponent("Player", &components.Player{ID: 1, Funds: 10000})
 	world.AddEntity(playerEntity)
 
 	// List of all neighborhoods
-	allNeighborhoods := []*models.Neighborhood{
+	allNeighborhoods := []*components.Neighborhood{
 		neighborhoods.GetDowntownDistrictNeighborhood(),
 		neighborhoods.GetHistoricHeightsNeighborhood(),
 		neighborhoods.GetTechValleyNeighborhood(),
@@ -69,17 +64,15 @@ func InitializeGame() *ecs.World {
 	return world
 }
 
-func addPropertyToWorld(world *ecs.World, prop *models.Property) {
+func addPropertyToWorld(world *ecs.World, prop *components.Property) {
 	entity := ecs.NewEntity(prop.ID)
-	entity.AddComponent("PropertyComponent", &components.PropertyComponent{
-		Property: prop,
-	})
+	entity.AddComponent("Property", prop)
 	world.AddEntity(entity)
 }
 
 // getNeighborhoodMap creates a map of Neighborhood ID to Neighborhood pointer
-func getNeighborhoodMap(neighborhoods []*models.Neighborhood) map[int]*models.Neighborhood {
-	neighborhoodMap := make(map[int]*models.Neighborhood)
+func getNeighborhoodMap(neighborhoods []*components.Neighborhood) map[int]*components.Neighborhood {
+	neighborhoodMap := make(map[int]*components.Neighborhood)
 	for _, neighborhood := range neighborhoods {
 		neighborhoodMap[neighborhood.ID] = neighborhood
 	}

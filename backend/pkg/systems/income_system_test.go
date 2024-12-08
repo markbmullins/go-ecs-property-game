@@ -7,7 +7,6 @@ import (
 
 	"github.com/markbmullins/city-developer/pkg/components"
 	"github.com/markbmullins/city-developer/pkg/ecs"
-	"github.com/markbmullins/city-developer/pkg/models"
 	"github.com/markbmullins/city-developer/pkg/systems"
 	"github.com/markbmullins/city-developer/pkg/utils"
 	"github.com/stretchr/testify/assert"
@@ -17,24 +16,18 @@ import (
 // It checks for prerequisites and updates the property's upgrade level if successful.
 func applyUpgrade(world *ecs.World, propertyID int, upgradeID string, currentDate time.Time) bool {
 	// Locate the property entity
-	var propertyComp *components.PropertyComponent
+	var property *components.Property
 	for _, entity := range world.Entities {
-		prop := entity.GetComponent("PropertyComponent")
+		prop := entity.GetComponent("Property")
 		if prop != nil && entity.ID == propertyID {
-			propertyComp = prop.(*components.PropertyComponent)
+			property = prop.(*components.Property)
 			break
 		}
 	}
 
-	if propertyComp == nil {
-		fmt.Printf("Property with ID %d not found!\n", propertyID)
-		return false
-	}
-
-	property := propertyComp.Property
 
 	// Find the upgrade by ID
-	var targetUpgrade *models.Upgrade
+	var targetUpgrade *components.Upgrade
 	for i := range property.UpgradePaths {
 		for _, upg := range property.UpgradePaths[i] {
 			if upg.ID == upgradeID {
@@ -83,28 +76,27 @@ func createTestWorld(purchaseDate time.Time, baseRent float64) *ecs.World {
 
 	// Add GameTime component
 	gameTime := &components.GameTime{
-		Time: &models.GameTime{
-			CurrentDate:     purchaseDate,
-			IsPaused:        false,
-			SpeedMultiplier: 1.0,
-			LastUpdated:     purchaseDate,
-		},
+		CurrentDate:     purchaseDate,
+		IsPaused:        false,
+		SpeedMultiplier: 1.0,
+		LastUpdated:     purchaseDate,
 	}
+
 	timeEntity := ecs.NewEntity(0)
 	timeEntity.AddComponent("GameTime", gameTime)
 	world.AddEntity(timeEntity)
 
 	// Add Player component
-	player := &models.Player{
+	player := &components.Player{
 		ID:    1,
 		Funds: 0,
 	}
 	playerEntity := ecs.NewEntity(1)
-	playerEntity.AddComponent("PlayerComponent", &components.PlayerComponent{Player: player})
+	playerEntity.AddComponent("Player", player)
 	world.AddEntity(playerEntity)
 
 	// Add Property component
-	property := &models.Property{
+	property := &components.Property{
 		Name:         "Test Property",
 		Owned:        true,
 		BaseRent:     baseRent,
@@ -113,7 +105,7 @@ func createTestWorld(purchaseDate time.Time, baseRent float64) *ecs.World {
 		ProrateRent:  true,
 	}
 	propertyEntity := ecs.NewEntity(2)
-	propertyEntity.AddComponent("PropertyComponent", &components.PropertyComponent{Property: property})
+	propertyEntity.AddComponent("Property", property)
 	world.AddEntity(propertyEntity)
 
 	return world
@@ -125,28 +117,26 @@ func createTestWorldWithUpgrades(purchaseDate time.Time, baseRent float64) *ecs.
 
 	// Add GameTime component
 	gameTime := &components.GameTime{
-		Time: &models.GameTime{
 			CurrentDate:     purchaseDate,
 			IsPaused:        false,
 			SpeedMultiplier: 1.0,
 			LastUpdated:     purchaseDate,
-		},
-	}
+		}
 	timeEntity := ecs.NewEntity(0)
 	timeEntity.AddComponent("GameTime", gameTime)
 	world.AddEntity(timeEntity)
 
 	// Add Player component
-	player := &models.Player{
+	player := &components.Player{
 		ID:    1,
 		Funds: 0,
 	}
 	playerEntity := ecs.NewEntity(1)
-	playerEntity.AddComponent("PlayerComponent", &components.PlayerComponent{Player: player})
+	playerEntity.AddComponent("Player", player)
 	world.AddEntity(playerEntity)
 
 	// Define Upgrades with Prerequisites
-	renovatedInterior := models.Upgrade{
+	renovatedInterior := components.Upgrade{
 		ID:             "renovated_interior",
 		Name:           "Renovated Interior",
 		Level:          1,
@@ -156,7 +146,7 @@ func createTestWorldWithUpgrades(purchaseDate time.Time, baseRent float64) *ecs.
 		Prerequisite:   nil,
 	}
 
-	smartHomeAutomation := models.Upgrade{
+	smartHomeAutomation := components.Upgrade{
 		ID:             "smart_home_automation",
 		Name:           "Smart Home Automation",
 		Level:          2,
@@ -166,7 +156,7 @@ func createTestWorldWithUpgrades(purchaseDate time.Time, baseRent float64) *ecs.
 		Prerequisite:   &renovatedInterior,
 	}
 
-	premiumFixtures := models.Upgrade{
+	premiumFixtures := components.Upgrade{
 		ID:             "premium_fixtures",
 		Name:           "Premium Fixtures",
 		Level:          3,
@@ -177,22 +167,22 @@ func createTestWorldWithUpgrades(purchaseDate time.Time, baseRent float64) *ecs.
 	}
 
 	// Create Property with Upgrade Paths
-	property := &models.Property{
+	property := &components.Property{
 		Name:         "Test Property with Upgrades",
 		Owned:        true,
 		BaseRent:     baseRent,
 		PlayerID:     1,
 		PurchaseDate: purchaseDate,
 		ProrateRent:  true,
-		Upgrades:     []models.Upgrade{},
-		UpgradePaths: map[string][]models.Upgrade{
+		Upgrades:     []components.Upgrade{},
+		UpgradePaths: map[string][]components.Upgrade{
 			"Luxury": {renovatedInterior, smartHomeAutomation, premiumFixtures},
 		},
 	}
 
 	// Add Property component
 	propertyEntity := ecs.NewEntity(2)
-	propertyEntity.AddComponent("PropertyComponent", &components.PropertyComponent{Property: property})
+	propertyEntity.AddComponent("Property", property)
 	world.AddEntity(propertyEntity)
 
 	return world
@@ -204,28 +194,26 @@ func createTestWorldWithCircularUpgrades(purchaseDate time.Time, baseRent float6
 
 	// Add GameTime component
 	gameTime := &components.GameTime{
-		Time: &models.GameTime{
 			CurrentDate:     purchaseDate,
 			IsPaused:        false,
 			SpeedMultiplier: 1.0,
 			LastUpdated:     purchaseDate,
-		},
-	}
+		}
 	timeEntity := ecs.NewEntity(0)
 	timeEntity.AddComponent("GameTime", gameTime)
 	world.AddEntity(timeEntity)
 
 	// Add Player component
-	player := &models.Player{
+	player := &components.Player{
 		ID:    1,
 		Funds: 0,
 	}
 	playerEntity := ecs.NewEntity(1)
-	playerEntity.AddComponent("PlayerComponent", &components.PlayerComponent{Player: player})
+	playerEntity.AddComponent("Player", player)
 	world.AddEntity(playerEntity)
 
 	// Define Upgrades with Circular Prerequisites
-	upgradeA := models.Upgrade{
+	upgradeA := components.Upgrade{
 		ID:             "upgrade_a",
 		Name:           "Upgrade A",
 		Level:          1,
@@ -235,7 +223,7 @@ func createTestWorldWithCircularUpgrades(purchaseDate time.Time, baseRent float6
 		Prerequisite:   nil, // Will be set to Upgrade B
 	}
 
-	upgradeB := models.Upgrade{
+	upgradeB := components.Upgrade{
 		ID:             "upgrade_b",
 		Name:           "Upgrade B",
 		Level:          2,
@@ -249,22 +237,22 @@ func createTestWorldWithCircularUpgrades(purchaseDate time.Time, baseRent float6
 	upgradeA.Prerequisite = &upgradeB
 
 	// Create Property with Upgrade Paths
-	property := &models.Property{
+	property := &components.Property{
 		Name:         "Test Property with Circular Upgrades",
 		Owned:        true,
 		BaseRent:     baseRent,
 		PlayerID:     1,
 		PurchaseDate: purchaseDate,
 		ProrateRent:  true,
-		Upgrades:     []models.Upgrade{},
-		UpgradePaths: map[string][]models.Upgrade{
+		Upgrades:     []components.Upgrade{},
+		UpgradePaths: map[string][]components.Upgrade{
 			"CircularPath": {upgradeA, upgradeB},
 		},
 	}
 
 	// Add Property component
 	propertyEntity := ecs.NewEntity(2)
-	propertyEntity.AddComponent("PropertyComponent", &components.PropertyComponent{Property: property})
+	propertyEntity.AddComponent("Property", property)
 	world.AddEntity(propertyEntity)
 
 	return world
@@ -276,28 +264,26 @@ func createTestWorldWithUpgradeChain(purchaseDate time.Time, baseRent float64) *
 
 	// Add GameTime component
 	gameTime := &components.GameTime{
-		Time: &models.GameTime{
 			CurrentDate:     purchaseDate,
 			IsPaused:        false,
 			SpeedMultiplier: 1.0,
 			LastUpdated:     purchaseDate,
-		},
-	}
+		}
 	timeEntity := ecs.NewEntity(0)
 	timeEntity.AddComponent("GameTime", gameTime)
 	world.AddEntity(timeEntity)
 
 	// Add Player component
-	player := &models.Player{
+	player := &components.Player{
 		ID:    1,
 		Funds: 0,
 	}
 	playerEntity := ecs.NewEntity(1)
-	playerEntity.AddComponent("PlayerComponent", &components.PlayerComponent{Player: player})
+	playerEntity.AddComponent("Player", player)
 	world.AddEntity(playerEntity)
 
 	// Define Upgrades with Prerequisite Chain
-	upgradedInterior := models.Upgrade{
+	upgradedInterior := components.Upgrade{
 		ID:             "upgrade_1",
 		Name:           "Upgrade 1",
 		Level:          1,
@@ -307,7 +293,7 @@ func createTestWorldWithUpgradeChain(purchaseDate time.Time, baseRent float64) *
 		Prerequisite:   nil,
 	}
 
-	upgrade2 := models.Upgrade{
+	upgrade2 := components.Upgrade{
 		ID:             "upgrade_2",
 		Name:           "Upgrade 2",
 		Level:          2,
@@ -317,7 +303,7 @@ func createTestWorldWithUpgradeChain(purchaseDate time.Time, baseRent float64) *
 		Prerequisite:   &upgradedInterior,
 	}
 
-	upgrade3 := models.Upgrade{
+	upgrade3 := components.Upgrade{
 		ID:             "upgrade_3",
 		Name:           "Upgrade 3",
 		Level:          3,
@@ -328,22 +314,22 @@ func createTestWorldWithUpgradeChain(purchaseDate time.Time, baseRent float64) *
 	}
 
 	// Create Property with Upgrade Paths
-	property := &models.Property{
+	property := &components.Property{
 		Name:         "Test Property with Upgrade Chain",
 		Owned:        true,
 		BaseRent:     baseRent,
 		PlayerID:     1,
 		PurchaseDate: purchaseDate,
 		ProrateRent:  true,
-		Upgrades:     []models.Upgrade{},
-		UpgradePaths: map[string][]models.Upgrade{
+		Upgrades:     []components.Upgrade{},
+		UpgradePaths: map[string][]components.Upgrade{
 			"ChainPath": {upgradedInterior, upgrade2, upgrade3},
 		},
 	}
 
 	// Add Property component
 	propertyEntity := ecs.NewEntity(2)
-	propertyEntity.AddComponent("PropertyComponent", &components.PropertyComponent{Property: property})
+	propertyEntity.AddComponent("Property", property)
 	world.AddEntity(propertyEntity)
 
 	return world
@@ -355,28 +341,26 @@ func createTestWorldWithUpgradeTree(purchaseDate time.Time, baseRent float64) *e
 
 	// Add GameTime component
 	gameTime := &components.GameTime{
-		Time: &models.GameTime{
 			CurrentDate:     purchaseDate,
 			IsPaused:        false,
 			SpeedMultiplier: 1.0,
 			LastUpdated:     purchaseDate,
-		},
-	}
+		}
 	timeEntity := ecs.NewEntity(0)
 	timeEntity.AddComponent("GameTime", gameTime)
 	world.AddEntity(timeEntity)
 
 	// Add Player component
-	player := &models.Player{
+	player := &components.Player{
 		ID:    1,
 		Funds: 0,
 	}
 	playerEntity := ecs.NewEntity(1)
-	playerEntity.AddComponent("PlayerComponent", &components.PlayerComponent{Player: player})
+	playerEntity.AddComponent("Player", player)
 	world.AddEntity(playerEntity)
 
 	// Define Upgrades for "Luxury" path
-	renovatedInterior := models.Upgrade{
+	renovatedInterior := components.Upgrade{
 		ID:             "renovated_interior",
 		Name:           "Renovated Interior",
 		Level:          1,
@@ -386,7 +370,7 @@ func createTestWorldWithUpgradeTree(purchaseDate time.Time, baseRent float64) *e
 		Prerequisite:   nil,
 	}
 
-	smartHomeAutomation := models.Upgrade{
+	smartHomeAutomation := components.Upgrade{
 		ID:             "smart_home_automation",
 		Name:           "Smart Home Automation",
 		Level:          2,
@@ -396,7 +380,7 @@ func createTestWorldWithUpgradeTree(purchaseDate time.Time, baseRent float64) *e
 		Prerequisite:   &renovatedInterior,
 	}
 
-	premiumFixtures := models.Upgrade{
+	premiumFixtures := components.Upgrade{
 		ID:             "premium_fixtures",
 		Name:           "Premium Fixtures",
 		Level:          3,
@@ -407,7 +391,7 @@ func createTestWorldWithUpgradeTree(purchaseDate time.Time, baseRent float64) *e
 	}
 
 	// Define Upgrades for "Efficiency" path
-	solarPanels := models.Upgrade{
+	solarPanels := components.Upgrade{
 		ID:             "solar_panels",
 		Name:           "Solar Panels",
 		Level:          1,
@@ -417,7 +401,7 @@ func createTestWorldWithUpgradeTree(purchaseDate time.Time, baseRent float64) *e
 		Prerequisite:   nil,
 	}
 
-	energyEfficientWindows := models.Upgrade{
+	energyEfficientWindows := components.Upgrade{
 		ID:             "energy_efficient_windows",
 		Name:           "Energy-efficient Windows",
 		Level:          2,
@@ -427,7 +411,7 @@ func createTestWorldWithUpgradeTree(purchaseDate time.Time, baseRent float64) *e
 		Prerequisite:   &solarPanels,
 	}
 
-	highEfficiencyHVAC := models.Upgrade{
+	highEfficiencyHVAC := components.Upgrade{
 		ID:             "high_efficiency_hvac",
 		Name:           "High-efficiency HVAC",
 		Level:          3,
@@ -438,15 +422,15 @@ func createTestWorldWithUpgradeTree(purchaseDate time.Time, baseRent float64) *e
 	}
 
 	// Create Property with Upgrade Paths
-	property := &models.Property{
+	property := &components.Property{
 		Name:         "Test Property with Multiple Paths",
 		Owned:        true,
 		BaseRent:     baseRent,
 		PlayerID:     1,
 		PurchaseDate: purchaseDate,
 		ProrateRent:  true,
-		Upgrades:     []models.Upgrade{},
-		UpgradePaths: map[string][]models.Upgrade{
+		Upgrades:     []components.Upgrade{},
+		UpgradePaths: map[string][]components.Upgrade{
 			"Luxury":     {renovatedInterior, smartHomeAutomation, premiumFixtures},
 			"Efficiency": {solarPanels, energyEfficientWindows, highEfficiencyHVAC},
 		},
@@ -454,7 +438,7 @@ func createTestWorldWithUpgradeTree(purchaseDate time.Time, baseRent float64) *e
 
 	// Add Property component
 	propertyEntity := ecs.NewEntity(2)
-	propertyEntity.AddComponent("PropertyComponent", &components.PropertyComponent{Property: property})
+	propertyEntity.AddComponent("Property", property)
 	world.AddEntity(propertyEntity)
 
 	return world
@@ -477,7 +461,7 @@ func TestProratedRent(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 
 	// Expected prorated rent calculation:
 	// 1. Rent begins the day after the purchase date, i.e., January 28, 2023.
@@ -488,7 +472,7 @@ func TestProratedRent(t *testing.T) {
 	// Therefore, the expected funds in the player's account after the update is $125.00. 
 	expectedProratedRent := 125.0
 
-	assert.Equal(t, expectedProratedRent, playerComp.Player.Funds, "Prorated rent should be correct")
+	assert.Equal(t, expectedProratedRent, player.Funds, "Prorated rent should be correct")
 }
 
 // TestFullMonthRent tests full rent collection for a single month at normal speed.
@@ -502,7 +486,7 @@ func TestPurchaseOnFirstDayOfMonth(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	// Expected rent calculation:
 	// 1. Rent starts the day after the purchase date. Since the property was purchased on January 1, rent begins on January 2.
 	// 2. January has 31 days, so rent is calculated for 30 days (January 2–31 inclusive).
@@ -512,7 +496,7 @@ func TestPurchaseOnFirstDayOfMonth(t *testing.T) {
 	// As a result, the expected rent collected is 965.00 instead of the full 1000.00.
 	expectedFullRent := 965.0
 
-	assert.Equal(t, expectedFullRent, playerComp.Player.Funds, "Full monthly rent should be collected")
+	assert.Equal(t, expectedFullRent, player.Funds, "Full monthly rent should be collected")
 }
 
 func TestProratedAndFullMonthRent(t *testing.T) {
@@ -529,14 +513,14 @@ func TestProratedAndFullMonthRent(t *testing.T) {
 	incomeSystem.Update(world)
 
 	// Verify that January rent (prorated for 30 days) has been collected.
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	// 1. Rent starts the day after the purchase date. Since the property was purchased on January 1, rent begins on January 2.
 	// 2. January has 31 days, so rent is calculated for 30 days (January 2–31 inclusive).
 	// 3. Daily rent = Base rent / Days in January = 1000 / 31 ≈ 32.26.
 	// 4. Total rent = Daily rent × 30 days = 32.26 × 30 ≈ 967.80.
 	// 5. Rent is rounded down to the nearest multiple of 5: floor(967.80 / 5) * 5 = 965.00.
 	expectedProratedRent := 965.0
-	assert.Equal(t, expectedProratedRent, playerComp.Player.Funds, "Prorated January rent should be correct")
+	assert.Equal(t, expectedProratedRent, player.Funds, "Prorated January rent should be correct")
 
 	// Advance to March 1, 2023, to collect rent for February (full month).
 	gameTime.CurrentDate = time.Date(2023, 3, 1, 0, 0, 0, 0, time.UTC)
@@ -544,7 +528,7 @@ func TestProratedAndFullMonthRent(t *testing.T) {
 
 	// Verify that February's full rent has been collected.
 	expectedTotalFunds := expectedProratedRent + 1000.0
-	assert.Equal(t, expectedTotalFunds, playerComp.Player.Funds, "Full February rent should be collected")
+	assert.Equal(t, expectedTotalFunds, player.Funds, "Full February rent should be collected")
 }
 
 func TestFullMonthRent(t *testing.T) {
@@ -563,12 +547,12 @@ func TestFullMonthRent(t *testing.T) {
     incomeSystem := systems.IncomeSystem{}
     incomeSystem.Update(world)
 
-    playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+    player := world.Entities[1].GetComponent("Player").(*components.Player)
 
     // Full monthly rent is $1000.00.
     expectedFullRent := 1000.0
 
-    assert.Equal(t, expectedFullRent, playerComp.Player.Funds, "Full February rent should be collected")
+    assert.Equal(t, expectedFullRent, player.Funds, "Full February rent should be collected")
 }
 
 // TestMultipleMonthAdvancement tests rent collection when more than one month passes in a single update.
@@ -582,7 +566,7 @@ func TestMultipleMonthAdvancement(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	// Expected rent calculation:
 	// 1. Rent starts the day after the purchase date. Since the property was purchased on January 1, rent begins on January 2.
 	// 2. January has 31 days, so rent is calculated for 30 days (January 2–31 inclusive).
@@ -598,7 +582,7 @@ func TestMultipleMonthAdvancement(t *testing.T) {
 	// Thus, the expected total rent collected is $3965.00.
 	expectedTotalRent := 965.0 + 1000.0*3
 
-	assert.Equal(t, expectedTotalRent, playerComp.Player.Funds, "Rent for 4 months should be collected")
+	assert.Equal(t, expectedTotalRent, player.Funds, "Rent for 4 months should be collected")
 }
 
 // TestSpeedMultiplierEffect tests rent collection when the game speed multiplier is set to high values.
@@ -612,10 +596,10 @@ func TestSpeedMultiplierEffect(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	expectedTotalRent := 965.0 + 1000.0*11 // Correct total rent based on prorated first month
 
-	assert.Equal(t, expectedTotalRent, playerComp.Player.Funds, "Rent for 12 months should be collected")
+	assert.Equal(t, expectedTotalRent, player.Funds, "Rent for 12 months should be collected")
 }
 
 func TestLeapYearFebruary(t *testing.T) {
@@ -634,12 +618,12 @@ func TestLeapYearFebruary(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 
 	// Expected prorataed rent for February (29 days - purchase day)
 	expectedRent := 965.0
 
-	assert.Equal(t, expectedRent, playerComp.Player.Funds, "Full rent should be collected for leap year February")
+	assert.Equal(t, expectedRent, player.Funds, "Full rent should be collected for leap year February")
 }
 
 func TestFuturePropertyPurchase(t *testing.T) {
@@ -655,10 +639,10 @@ func TestFuturePropertyPurchase(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	expectedRent := 0.0
 
-	assert.Equal(t, expectedRent, playerComp.Player.Funds, "No rent should be collected for a future property purchase")
+	assert.Equal(t, expectedRent, player.Funds, "No rent should be collected for a future property purchase")
 }
 
 func TestRentNotCollectedWhenGamePaused(t *testing.T) {
@@ -675,10 +659,10 @@ func TestRentNotCollectedWhenGamePaused(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	expectedRent := 0.0 // No rent when game is paused
 
-	assert.Equal(t, expectedRent, playerComp.Player.Funds, "No rent should be collected when game is paused")
+	assert.Equal(t, expectedRent, player.Funds, "No rent should be collected when game is paused")
 }
 
 func TestMultiplePropertiesWithDifferentPlayers(t *testing.T) {
@@ -686,24 +670,22 @@ func TestMultiplePropertiesWithDifferentPlayers(t *testing.T) {
 
 	// Add GameTime component
 	gameTime := &components.GameTime{
-		Time: &models.GameTime{
-			CurrentDate:     time.Date(2023, 2, 1, 0, 0, 0, 0, time.UTC),
-			IsPaused:        false,
-			SpeedMultiplier: 1.0,
-			LastUpdated:     time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-		},
+		CurrentDate:     time.Date(2023, 2, 1, 0, 0, 0, 0, time.UTC),
+		IsPaused:        false,
+		SpeedMultiplier: 1.0,
+		LastUpdated:     time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
 	}
 	timeEntity := ecs.NewEntity(0)
 	timeEntity.AddComponent("GameTime", gameTime)
 	world.AddEntity(timeEntity)
 
 	// Add Player 1 and Property 1
-	player1 := &models.Player{ID: 1, Funds: 0}
+	player1 := &components.Player{ID: 1, Funds: 0}
 	playerEntity1 := ecs.NewEntity(1)
-	playerEntity1.AddComponent("PlayerComponent", &components.PlayerComponent{Player: player1})
+	playerEntity1.AddComponent("Player", player1)
 	world.AddEntity(playerEntity1)
 
-	property1 := &models.Property{
+	property1 := &components.Property{
 		Name:         "Property1",
 		Owned:        true,
 		BaseRent:     1000.0,
@@ -712,16 +694,16 @@ func TestMultiplePropertiesWithDifferentPlayers(t *testing.T) {
 		ProrateRent:  true,
 	}
 	propertyEntity1 := ecs.NewEntity(2)
-	propertyEntity1.AddComponent("PropertyComponent", &components.PropertyComponent{Property: property1})
+	propertyEntity1.AddComponent("Property", property1)
 	world.AddEntity(propertyEntity1)
 
 	// Add Player 2 and Property 2
-	player2 := &models.Player{ID: 3, Funds: 0} // Player ID is 3
+	player2 := &components.Player{ID: 3, Funds: 0} // Player ID is 3
 	playerEntity2 := ecs.NewEntity(3)
-	playerEntity2.AddComponent("PlayerComponent", &components.PlayerComponent{Player: player2})
+	playerEntity2.AddComponent("Player", player2)
 	world.AddEntity(playerEntity2)
 
-	property2 := &models.Property{
+	property2 := &components.Property{
 		Name:         "Property2",
 		Owned:        true,
 		BaseRent:     2000.0,
@@ -730,7 +712,7 @@ func TestMultiplePropertiesWithDifferentPlayers(t *testing.T) {
 		ProrateRent:  true,
 	}
 	propertyEntity2 := ecs.NewEntity(4)
-	propertyEntity2.AddComponent("PropertyComponent", &components.PropertyComponent{Property: property2})
+	propertyEntity2.AddComponent("Property", property2)
 	world.AddEntity(propertyEntity2)
 
 	incomeSystem := systems.IncomeSystem{}
@@ -755,12 +737,12 @@ func TestMultiplePropertiesWithDifferentPlayers(t *testing.T) {
 	// Player 2 expected = 1935.00
 
 	// Assert funds for Player 1
-	playerComp1 := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
-	assert.Equal(t, 965.0, playerComp1.Player.Funds, "Player 1's rent should be collected correctly")
+	playerComp1 := world.Entities[1].GetComponent("Player").(*components.Player)
+	assert.Equal(t, 965.0, playerComp1.Funds, "Player 1's rent should be collected correctly")
 
 	// Assert funds for Player 2
-	playerComp2 := world.Entities[3].GetComponent("PlayerComponent").(*components.PlayerComponent)
-	assert.Equal(t, 1935.0, playerComp2.Player.Funds, "Player 2's rent should be collected correctly")
+	playerComp2 := world.Entities[3].GetComponent("Player").(*components.Player)
+	assert.Equal(t, 1935.0, playerComp2.Funds, "Player 2's rent should be collected correctly")
 }
 
 func TestRentWithPropertyUpgrade(t *testing.T) {
@@ -769,11 +751,11 @@ func TestRentWithPropertyUpgrade(t *testing.T) {
 	world := createTestWorld(purchaseDate, 1000.0)
 
 	// Configure Property Upgrades
-	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	propertyComp.Property.Upgrades = []models.Upgrade{
+	propertyComp := world.Entities[2].GetComponent("Property").(*components.Property)
+	propertyComp.Upgrades = []components.Upgrade{
 		{RentIncrease: 200.0}, // Level 1
 	}
-	propertyComp.Property.ProrateRent = false // Ensure full rent is collected
+	propertyComp.ProrateRent = false // Ensure full rent is collected
 
 	// Set CurrentDate to January 31, 2023
 	gameTime, err := utils.GetCurrentGameTime(world)
@@ -785,10 +767,10 @@ func TestRentWithPropertyUpgrade(t *testing.T) {
 	incomeSystem.Update(world)
 
 	// Assert Player Funds
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	expectedRent := 1200.0 // 1000 base + 200 upgrade
 
-	assert.Equal(t, expectedRent, playerComp.Player.Funds, "Rent should include property upgrade effect")
+	assert.Equal(t, expectedRent, player.Funds, "Rent should include property upgrade effect")
 }
 
 func TestProratedRentWithUpgrade(t *testing.T) {
@@ -800,8 +782,8 @@ func TestProratedRentWithUpgrade(t *testing.T) {
 	// So rent kicks in Jan 16 to Jan 31 inclusive! 16 days
 
 	// Configure Property Upgrades
-	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	propertyComp.Property.Upgrades = []models.Upgrade{
+	propertyComp := world.Entities[2].GetComponent("Property").(*components.Property)
+	propertyComp.Upgrades = []components.Upgrade{
 		{
 			RentIncrease:   200.0,
 			PurchaseDate:   purchaseDate,
@@ -821,14 +803,14 @@ func TestProratedRentWithUpgrade(t *testing.T) {
 	// Assert Player Funds
 	// Calculate Expected Rent
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	// TODO: which rent is correct?
 	// expectedProratedRent := 715.0
 	// (baseRent * 16)/31 rounded down to nearest 5 + 200 * 16 / 31 rounded down to nearest 5
 	expectedProratedRent := 615.0
 
 	// verify if the IncomeSystem correctly calculates daysOwned.
-	assert.Equal(t, expectedProratedRent, playerComp.Player.Funds, "Prorated rent should include property upgrade effect")
+	assert.Equal(t, expectedProratedRent, player.Funds, "Prorated rent should include property upgrade effect")
 }
 
 func TestMultiLevelUpgrades(t *testing.T) {
@@ -836,8 +818,8 @@ func TestMultiLevelUpgrades(t *testing.T) {
 	world := createTestWorld(purchaseDate, 1000.0)
 
 	// Configure Property with multiple upgrade levels
-	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	propertyComp.Property.Upgrades = []models.Upgrade{
+	propertyComp := world.Entities[2].GetComponent("Property").(*components.Property)
+	propertyComp.Upgrades = []components.Upgrade{
 		{RentIncrease: 100.0, DaysToComplete: 0, PurchaseDate: purchaseDate},                  // Level 1
 		{RentIncrease: 200.0, DaysToComplete: 0, PurchaseDate: purchaseDate.AddDate(0, 0, 1)}, // Level 2
 		{RentIncrease: 300.0, DaysToComplete: 0, PurchaseDate: purchaseDate.AddDate(0, 0, 2)}, // Level 3
@@ -850,10 +832,10 @@ func TestMultiLevelUpgrades(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	expectedRent := 1520.0
 
-	assert.Equal(t, expectedRent, playerComp.Player.Funds, "Rent with multiple upgrades should be collected correctly")
+	assert.Equal(t, expectedRent, player.Funds, "Rent with multiple upgrades should be collected correctly")
 }
 
 func TestExcessiveUpgradeLevel(t *testing.T) {
@@ -861,8 +843,8 @@ func TestExcessiveUpgradeLevel(t *testing.T) {
 	world := createTestWorld(purchaseDate, 1000.0)
 
 	// Configure Property with an out-of-bounds upgrade level
-	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	propertyComp.Property.Upgrades = []models.Upgrade{
+	property := world.Entities[2].GetComponent("Property").(*components.Property)
+	property.Upgrades = []components.Upgrade{
 		{RentIncrease: 100.0}, // Level 1
 	}
 
@@ -873,10 +855,10 @@ func TestExcessiveUpgradeLevel(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	expectedRent := 1060.0 // Correct total rent based on prorated base rent + available upgrades
 
-	assert.Equal(t, expectedRent, playerComp.Player.Funds, "Rent should include available upgrades even if UpgradeLevel exceeds available upgrades")
+	assert.Equal(t, expectedRent, player.Funds, "Rent should include available upgrades even if UpgradeLevel exceeds available upgrades")
 }
 
 func TestFractionalSpeedMultiplier(t *testing.T) {
@@ -891,10 +873,10 @@ func TestFractionalSpeedMultiplier(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	expectedRent := 965.0
 
-	assert.Equal(t, expectedRent, playerComp.Player.Funds, "Fractional speed multiplier should not partially advance month")
+	assert.Equal(t, expectedRent, player.Funds, "Fractional speed multiplier should not partially advance month")
 }
 
 func TestNewMonthFlag(t *testing.T) {
@@ -912,22 +894,20 @@ func TestNewMonthFlag(t *testing.T) {
 	assert.True(t, gameTime.NewMonth, "NewMonth flag should be set after month advancement")
 }
 
-func TestMissingPropertyComponent(t *testing.T) {
+func TestMissingProperty(t *testing.T) {
 	world := ecs.NewWorld()
-	world.AddEntity(ecs.NewEntity(0)) // Only adding GameTime, no PropertyComponent
+	world.AddEntity(ecs.NewEntity(0)) // Only adding GameTime, no Property
 
 	gameTime := &components.GameTime{
-		Time: &models.GameTime{
-			CurrentDate: time.Date(2023, 2, 1, 0, 0, 0, 0, time.UTC),
-			IsPaused:    false,
-		},
+		CurrentDate: time.Date(2023, 2, 1, 0, 0, 0, 0, time.UTC),
+		IsPaused:    false,
 	}
 	world.Entities[0].AddComponent("GameTime", gameTime)
 
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	// Test should pass without error even though PropertyComponent is missing
+	// Test should pass without error even though Property is missing
 }
 
 func TestLastUpdatedAfterCurrentDate(t *testing.T) {
@@ -942,10 +922,10 @@ func TestLastUpdatedAfterCurrentDate(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	expectedRent := 0.0
 
-	assert.Equal(t, expectedRent, playerComp.Player.Funds, "No rent should be collected if LastUpdated is after CurrentDate")
+	assert.Equal(t, expectedRent, player.Funds, "No rent should be collected if LastUpdated is after CurrentDate")
 }
 
 func TestPurchaseAfterLeapYearFebruary(t *testing.T) {
@@ -959,10 +939,10 @@ func TestPurchaseAfterLeapYearFebruary(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	expectedRent := 965.0 // Correct total rent based on prorated first month
 
-	assert.Equal(t, expectedRent, playerComp.Player.Funds, "Rent should be collected correctly after leap year February")
+	assert.Equal(t, expectedRent, player.Funds, "Rent should be collected correctly after leap year February")
 }
 
 func TestBackdatedRentCollection(t *testing.T) {
@@ -977,10 +957,10 @@ func TestBackdatedRentCollection(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	expectedRent := 0.0 // No rent due to backdated dates
 
-	assert.Equal(t, expectedRent, playerComp.Player.Funds, "No rent should be collected when CurrentDate is backdated")
+	assert.Equal(t, expectedRent, player.Funds, "No rent should be collected when CurrentDate is backdated")
 }
 
 func TestPropertyPurchaseDuringFebruaryNonLeapYear(t *testing.T) {
@@ -994,10 +974,10 @@ func TestPropertyPurchaseDuringFebruaryNonLeapYear(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	expectedProratedRent := 460.0
 
-	assert.Equal(t, expectedProratedRent, playerComp.Player.Funds, "Prorated rent should be correct for February in non-leap year")
+	assert.Equal(t, expectedProratedRent, player.Funds, "Prorated rent should be correct for February in non-leap year")
 }
 
 func TestUpgradePrerequisiteEnforcement(t *testing.T) {
@@ -1010,8 +990,8 @@ func TestUpgradePrerequisiteEnforcement(t *testing.T) {
 	assert.False(t, success, "Upgrade should not be applied without prerequisites")
 
 	// Verify that UpgradeLevel remains 0
-	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	assert.Equal(t, 0, len(propertyComp.Property.Upgrades), "Upgrade level should remain 0 when prerequisites are not met")
+	property := world.Entities[2].GetComponent("Property").(*components.Property)
+	assert.Equal(t, 0, len(property.Upgrades), "Upgrade level should remain 0 when prerequisites are not met")
 }
 
 func TestUpgradeApplicationOrder(t *testing.T) {
@@ -1036,8 +1016,8 @@ func TestUpgradeApplicationOrder(t *testing.T) {
 	assert.True(t, success, "Upgrade 'premium_fixtures' should be applied successfully after prerequisites")
 
 	// Verify that UpgradeLevel is 3
-	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	assert.Equal(t, 3, len(propertyComp.Property.Upgrades), "Upgrade level should be 3 after applying three upgrades")
+	property := world.Entities[2].GetComponent("Property").(*components.Property)
+	assert.Equal(t, 3, len(property.Upgrades), "Upgrade level should be 3 after applying three upgrades")
 }
 
 func TestUpgradePathIndependence(t *testing.T) {
@@ -1063,8 +1043,8 @@ func TestUpgradePathIndependence(t *testing.T) {
 	assert.True(t, success, "Upgrade 'renovated_interior' should be applied successfully without affecting 'Efficiency' path")
 
 	// Verify that UpgradeLevel reflects all applied upgrades
-	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	assert.Equal(t, 3, len(propertyComp.Property.Upgrades), "Upgrade level should be 3 after applying three independent upgrades")
+	property := world.Entities[2].GetComponent("Property").(*components.Property)
+	assert.Equal(t, 3, len(property.Upgrades), "Upgrade level should be 3 after applying three independent upgrades")
 }
 
 func TestUpgradeCompletionTiming(t *testing.T) {
@@ -1086,10 +1066,10 @@ func TestUpgradeCompletionTiming(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	expectedProratedRent := 1010.0
 
-	assert.Equal(t, expectedProratedRent, playerComp.Player.Funds, "Prorated rent should include upgrade effect after completion")
+	assert.Equal(t, expectedProratedRent, player.Funds, "Prorated rent should include upgrade effect after completion")
 }
 
 func TestCircularUpgradePrerequisites(t *testing.T) {
@@ -1106,8 +1086,8 @@ func TestCircularUpgradePrerequisites(t *testing.T) {
 	assert.False(t, success, "Upgrade 'upgrade_b' should not be applied without 'upgrade_a'")
 
 	// Verify that no upgrades have been applied
-	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	assert.Equal(t, 0, len(propertyComp.Property.Upgrades), "No upgrades should be applied due to circular prerequisites")
+	property := world.Entities[2].GetComponent("Property").(*components.Property)
+	assert.Equal(t, 0, len(property.Upgrades), "No upgrades should be applied due to circular prerequisites")
 }
 
 func TestUpgradePrerequisiteChain(t *testing.T) {
@@ -1136,8 +1116,8 @@ func TestUpgradePrerequisiteChain(t *testing.T) {
 	assert.True(t, success, "Upgrade 'upgrade_3' should be applied successfully after prerequisites")
 
 	// Verify that UpgradeLevel is 3
-	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	assert.Equal(t, 3, len(propertyComp.Property.Upgrades), "Upgrade level should be 3 after applying three upgrades")
+	property := world.Entities[2].GetComponent("Property").(*components.Property)
+	assert.Equal(t, 3, len(property.Upgrades), "Upgrade level should be 3 after applying three upgrades")
 
 	// Advance to February 1, 2023 and collect rent
 	gameTime, err := utils.GetCurrentGameTime(world)
@@ -1148,10 +1128,10 @@ func TestUpgradePrerequisiteChain(t *testing.T) {
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
 
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 	expectedRent := 1080.0
 
-	assert.Equal(t, expectedRent, playerComp.Player.Funds, "Rent should include all applied upgrades")
+	assert.Equal(t, expectedRent, player.Funds, "Rent should include all applied upgrades")
 }
 func TestUpgradeTreeComprehensive(t *testing.T) {
 	// Initialize test world with multiple upgrade paths
@@ -1191,8 +1171,8 @@ func TestUpgradeTreeComprehensive(t *testing.T) {
 	assert.True(t, success, "Upgrade 'high_efficiency_hvac' should be applied successfully after prerequisites")
 
 	// Verify that UpgradeLevel is 6
-	propertyComp := world.Entities[2].GetComponent("PropertyComponent").(*components.PropertyComponent)
-	assert.Equal(t, 6, len(propertyComp.Property.Upgrades), "Upgrade level should be 6 after applying six upgrades")
+	property := world.Entities[2].GetComponent("Property").(*components.Property)
+	assert.Equal(t, 6, len(property.Upgrades), "Upgrade level should be 6 after applying six upgrades")
 
 	// Advance to February 1, 2023 and collect rent
 	gameTime, err := utils.GetCurrentGameTime(world)
@@ -1202,8 +1182,8 @@ func TestUpgradeTreeComprehensive(t *testing.T) {
 
 	incomeSystem := systems.IncomeSystem{}
 	incomeSystem.Update(world)
-	playerComp := world.Entities[1].GetComponent("PlayerComponent").(*components.PlayerComponent)
+	player := world.Entities[1].GetComponent("Player").(*components.Player)
 
 	expectedRent := 1195.0
-	assert.Equal(t, expectedRent, playerComp.Player.Funds, "Rent should include all applied upgrades from multiple paths")
+	assert.Equal(t, expectedRent, player.Funds, "Rent should include all applied upgrades from multiple paths")
 }

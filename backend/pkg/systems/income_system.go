@@ -7,7 +7,6 @@ import (
 
 	"github.com/markbmullins/city-developer/pkg/components"
 	"github.com/markbmullins/city-developer/pkg/ecs"
-	"github.com/markbmullins/city-developer/pkg/models"
 	"github.com/markbmullins/city-developer/pkg/utils"
 )
 
@@ -97,12 +96,8 @@ func processMonth(world *ecs.World, startDate, endDate time.Time) {
 }
 
 func processEntityRent(world *ecs.World, entity *ecs.Entity, startDate, endDate time.Time) {
-	propComp := entity.GetComponent("PropertyComponent")
-	if propComp == nil {
-		return
-	}
+	property := entity.GetComponent("Property").(*components.Property)
 
-	property := propComp.(*components.PropertyComponent).Property
 	if !property.Owned {
 		return
 	}
@@ -119,7 +114,7 @@ func processEntityRent(world *ecs.World, entity *ecs.Entity, startDate, endDate 
 // - Each upgrade also begins contributing rent the day after it completes, if within the month.
 // - Both base rent and upgrades are prorated based on the number of days active in the month.
 // - After determining total active days for the property and any upgrades, it rounds the total rent down to the nearest multiple of 5.
-func calculateMonthlyRent(property *models.Property, monthStart, monthEnd time.Time) float64 {
+func calculateMonthlyRent(property *components.Property, monthStart, monthEnd time.Time) float64 {
 	daysInCurrentMonth := float64(daysInMonth(monthStart))
 	if daysInCurrentMonth == 0 {
 		// Safety check: Should never happen since daysInMonth should always return > 0
@@ -181,11 +176,11 @@ func calculateMonthlyRent(property *models.Property, monthStart, monthEnd time.T
 
 
 // distribute rent to correct player
-func distributeRentToOwner(world *ecs.World, property *models.Property, rent float64) {
+func distributeRentToOwner(world *ecs.World, property *components.Property, rent float64) {
 	for _, entity := range world.Entities {
-		playerComp := entity.GetComponent("PlayerComponent")
-		if playerComp != nil && playerComp.(*components.PlayerComponent).Player.ID == property.PlayerID {
-			playerComp.(*components.PlayerComponent).Player.Funds += rent
+		player := entity.GetComponent("Player").(*components.Player)
+		if player != nil && player.ID == property.PlayerID {
+			player.Funds += rent
 			return
 		}
 	}

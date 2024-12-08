@@ -1,7 +1,12 @@
 package components
 
-import "github.com/markbmullins/city-developer/pkg/models"
+import "time"
 
 type GameTime struct {
-	Time *models.GameTime
+	CurrentDate       time.Time
+	IsPaused          bool
+	SpeedMultiplier   float64 // 1.0 = normal, 2.0 = fast, etc.
+	NewMonth          bool
+	LastUpdated       time.Time
+	RentCollectionDay int // e.g., 1 for the 1st of the month
 }

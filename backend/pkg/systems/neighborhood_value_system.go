@@ -5,11 +5,10 @@ import (
 
 	"github.com/markbmullins/city-developer/pkg/components"
 	"github.com/markbmullins/city-developer/pkg/ecs"
-	"github.com/markbmullins/city-developer/pkg/models"
 )
 
 type NeighborhoodValueSystem struct {
-	Neighborhoods map[int]*models.Neighborhood
+	Neighborhoods map[int]*components.Neighborhood
 }
 
 // Update calculates the neighborhood value and applies rent boosts if applicable.
@@ -26,8 +25,7 @@ func (s *NeighborhoodValueSystem) Update(world *ecs.World) {
 				continue
 			}
 
-			propComp := propertyEntity.GetComponent("PropertyComponent").(*components.PropertyComponent)
-			property := propComp.Property
+			property := propertyEntity.GetComponent("Property").(*components.Property)
 			totalValue += property.Price
 
 			if len(property.Upgrades) > 0 {
@@ -45,8 +43,7 @@ func (s *NeighborhoodValueSystem) Update(world *ecs.World) {
 					continue
 				}
 
-				propComp := propertyEntity.GetComponent("PropertyComponent").(*components.PropertyComponent)
-				property := propComp.Property
+				property := propertyEntity.GetComponent("Property").(*components.Property)
 				property.RentBoost = (neighborhood.RentBoostPercent / 100) * property.BaseRent
 				fmt.Printf("Applied rent boost of %.2f%% to property %s in neighborhood %s\n",
 					neighborhood.RentBoostPercent, property.Name, neighborhood.Name)
