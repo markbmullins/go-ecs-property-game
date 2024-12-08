@@ -25,7 +25,10 @@ func GetTechValleyNeighborhood() *models.Neighborhood {
 	}
 }
 
-// TechResidential defines the residential properties for Tech Valley.
+func GetTechValleyProperties() []models.Property {
+	return append(TechResidential, TechCommercial...)
+}
+
 var TechResidential = []models.Property{
 	{
 		ID:                           41,
@@ -249,7 +252,6 @@ var TechResidential = []models.Property{
 	},
 }
 
-// TechCommercial defines the commercial properties for Tech Valley.
 var TechCommercial = []models.Property{
 	{
 		ID:                           51,
@@ -473,7 +475,6 @@ var TechCommercial = []models.Property{
 	},
 }
 
-// Helper functions to define upgrade paths
 func techResidentialUpgradePaths() map[string][]models.Upgrade {
 	return map[string][]models.Upgrade{
 		"Smart Living": {

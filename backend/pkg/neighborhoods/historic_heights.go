@@ -26,7 +26,10 @@ func GetHistoricHeightsNeighborhood() *models.Neighborhood {
 	}
 }
 
-// HistoricResidential defines the residential properties for Historic Heights.
+func GetHistoricHeightsProperties() []models.Property {
+	return append(HistoricResidential, HistoricCommercial...)
+}
+
 var HistoricResidential = []models.Property{
 	{
 		ID:                           21,
@@ -250,7 +253,6 @@ var HistoricResidential = []models.Property{
 	},
 }
 
-// HistoricCommercial defines the commercial properties for Historic Heights.
 var HistoricCommercial = []models.Property{
 	{
 		ID:                           31,
@@ -474,7 +476,6 @@ var HistoricCommercial = []models.Property{
 	},
 }
 
-// Helper functions to define upgrade paths
 func historicResidentialUpgradePaths() map[string][]models.Upgrade {
 	return map[string][]models.Upgrade{
 		"Restoration": {

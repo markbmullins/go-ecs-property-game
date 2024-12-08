@@ -11,5 +11,5 @@ type Upgrade struct {
 	DaysToComplete int
 	PurchaseDate   time.Time
 	Prerequisite   *Upgrade
-	Applied        bool
+	Applied        bool // New field to track if an upgrade has been applied
 }

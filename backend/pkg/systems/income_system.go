@@ -90,6 +90,9 @@ import (
 */
 
 // IncomeSystem handles rent collection, including prorated rent for the first month and upgrades.
+// type IncomeSystem struct{}
+
+// Update triggers the rent collection process, handling fast-forwarding of time.
 type IncomeSystem struct{}
 
 // Update triggers the rent collection process, handling fast-forwarding of time.
@@ -100,241 +103,179 @@ func (s *IncomeSystem) Update(world *ecs.World) {
 		return
 	}
 
-	// fmt.Printf("GameTime - CurrentDate: %s, LastUpdated: %s, IsPaused: %v\n",
-	// 	gameTime.CurrentDate.Format("2006-01-02"), gameTime.LastUpdated.Format("2006-01-02"), gameTime.IsPaused)
-
 	if !gameTime.IsPaused {
 		monthsPassed := calculateMonthsPassed(gameTime.LastUpdated, gameTime.CurrentDate)
-		// fmt.Printf("Months passed: %d\n", monthsPassed)
 		if monthsPassed > 0 {
-			// Pass currentDate to collectRentForSkippedMonths
-			collectRentForSkippedMonths(world, gameTime.LastUpdated, monthsPassed)
+			processRent(world, gameTime.LastUpdated, monthsPassed)
 			gameTime.NewMonth = true
 		}
 		gameTime.LastUpdated = gameTime.CurrentDate
 	}
 }
 
-// collectRentForSkippedMonths iterates through each skipped month and collects appropriate rent.
-func collectRentForSkippedMonths(world *ecs.World, lastUpdated time.Time, monthsPassed int) {
-	// fmt.Printf("Collecting rent for %d skipped months starting from %s\n", monthsPassed, lastUpdated.Format("2006-01-02"))
+// processRent collects rent for all elapsed months, handling partial and full months.
+func processRent(world *ecs.World, lastUpdated time.Time, monthsPassed int) {
+	// location := lastUpdated.Location()
+	firstOfNextMonth := nextMonthStart(lastUpdated)
 
-	location := lastUpdated.Location()
-
-	// Calculate the first day of the next month after lastUpdated
-	firstOfNextMonth := time.Date(lastUpdated.Year(), lastUpdated.Month(), 1, 0, 0, 0, 0, location).AddDate(0, 1, 0)
-
-	// Step 1: Handle partial month if lastUpdated is not the last day of the month
-	if lastUpdated.Day() != daysInMonth(lastUpdated) {
-		// Partial month: from lastUpdated to end of month
-		partialMonthStart := lastUpdated // Include the purchase day
-		partialMonthEnd := time.Date(lastUpdated.Year(), lastUpdated.Month(), daysInMonth(lastUpdated), 0, 0, 0, 0, location)
-
-		// fmt.Printf("Processing partial month: %s to %s\n", partialMonthStart.Format("2006-01-02"), partialMonthEnd.Format("2006-01-02"))
-
-		for _, entity := range world.Entities {
-			propComp := entity.GetComponent("PropertyComponent")
-			if propComp != nil {
-				property := propComp.(*components.PropertyComponent).Property
-				if property.Owned {
-					if property.PurchaseDate.Before(partialMonthStart) {
-						// Full rent for the partial month
-						collectFullRent(world, property, partialMonthStart, partialMonthEnd)
-					} else if property.PurchaseDate.After(partialMonthEnd) {
-						// No rent for this partial month
-						continue
-					} else {
-						// Prorated rent for the partial month
-						daysOwned := partialMonthEnd.Day() - property.PurchaseDate.Day()
-						proratedRent := calculateProratedRent(property, daysOwned, float64(daysInMonth(partialMonthStart)), partialMonthStart, partialMonthEnd)
-						distributeRentToOwner(world, property, proratedRent)
-						// fmt.Printf("Collected prorated rent for property %s: $%.2f\n", property.Name, proratedRent)
-					}
-				}
-			}
-		}
-
-		monthsPassed-- // Partial month already processed
+	// Handle partial month
+	if isPartialMonth(lastUpdated) {
+		processPartialMonth(world, lastUpdated, monthEnd(lastUpdated))
+		monthsPassed--
 	}
 
-	// Step 2: Handle full months
+	// Handle full months
 	for i := 0; i < monthsPassed; i++ {
-		// Calculate the specific month being processed
-		monthStartDate := firstOfNextMonth.AddDate(0, i, 0)
-		monthEndDate := monthStartDate.AddDate(0, 1, -1)
-
-		// fmt.Printf("Processing full month: %s to %s\n", monthStartDate.Format("2006-01-02"), monthEndDate.Format("2006-01-02"))
-
-		for _, entity := range world.Entities {
-			propComp := entity.GetComponent("PropertyComponent")
-			if propComp != nil {
-				property := propComp.(*components.PropertyComponent).Property
-				if property.Owned {
-					if property.PurchaseDate.Before(monthStartDate) || property.PurchaseDate.Equal(monthStartDate) {
-						// Full rent for the month
-						collectFullRent(world, property, monthStartDate, monthEndDate)
-					} else if property.PurchaseDate.After(monthEndDate) {
-						// No rent for this month
-						continue
-					} else {
-						// Prorated rent for the month
-						// Add one to include putchase date
-						daysOwned := daysInMonth(monthStartDate) - property.PurchaseDate.Day()
-						proratedRent := calculateProratedRent(property, daysOwned, float64(daysInMonth(monthStartDate)), monthStartDate, monthEndDate)
-						distributeRentToOwner(world, property, proratedRent)
-						// fmt.Printf("Collected prorated rent for property %s: $%.2f\n", property.Name, proratedRent)
-					}
-				}
-			}
-		}
+		startOfMonth := firstOfNextMonth.AddDate(0, i, 0)
+		endOfMonth := monthEnd(startOfMonth)
+		processFullMonth(world, startOfMonth, endOfMonth)
 	}
 }
 
-// collectFullRent collects the full monthly rent for a property, considering upgrades.
-func collectFullRent(world *ecs.World, property *models.Property, monthStartDate, monthEndDate time.Time) {
-	fullRent := calculateFullRent(property, monthStartDate, monthEndDate)
-	distributeRentToOwner(world, property, fullRent)
-	// fmt.Printf("Collected full monthly rent for property %s: $%.2f\n", property.Name, fullRent)
-}
-
-// calculateFullRent calculates full monthly rent, incorporating upgrades and their proration.
-func calculateFullRent(property *models.Property, monthStartDate, monthEndDate time.Time) float64 {
-	baseRent := property.BaseRent
-	totalUpgradeIncrease := 0.0
-	daysInMonth := float64(daysInMonth(monthStartDate))
-
-	for i := 0; i < property.UpgradeLevel && i < len(property.Upgrades); i++ {
-		upgrade := property.Upgrades[i]
-		completionDate := upgrade.PurchaseDate.AddDate(0, 0, upgrade.DaysToComplete)
-
-		if completionDate.Before(monthStartDate) {
-			// Upgrade completed before the month starts; full RentIncrease applies
-			totalUpgradeIncrease += upgrade.RentIncrease
-			// fmt.Printf("Upgrade %d completed before month start: +$%.2f\n", i+1, upgrade.RentIncrease)
-		} else if completionDate.Equal(monthStartDate) || completionDate.After(monthStartDate) && completionDate.Before(monthEndDate.AddDate(0, 0, 1)) {
-			// Upgrade completed during the month; prorate RentIncrease
-			daysAfterUpgrade := float64(monthEndDate.Sub(completionDate).Hours() / 24)
-			if daysAfterUpgrade < 0 {
-				daysAfterUpgrade = 0
-			}
-			proratedIncrease := (upgrade.RentIncrease * daysAfterUpgrade) / daysInMonth
-			proratedIncrease = roundToNearest5(proratedIncrease)
-			totalUpgradeIncrease += proratedIncrease
-			// fmt.Printf("Upgrade %d completed on %s: Prorated +$%.2f\n", i+1, completionDate.Format("2006-01-02"), proratedIncrease)
-		}
-		// Upgrades completed after the month are not included
-	}
-
-	fullRent := baseRent + totalUpgradeIncrease
-	// fmt.Printf("Total rent for property %s: $%.2f (Base: $%.2f + Upgrades: $%.2f)\n", property.Name, fullRent, baseRent, totalUpgradeIncrease)
-	return fullRent
-}
-
-// calculateProratedRent calculates prorated rent based on days owned in the specified month, including upgrades.
-func calculateProratedRent(property *models.Property, daysOwned int, daysInMonth float64, monthStartDate, monthEndDate time.Time) float64 {
-	// Prorate base rent
-	proratedBaseRent := (property.BaseRent * float64(daysOwned)) / daysInMonth
-
-	// Sum prorated upgrades
-	proratedUpgradeIncrease := 0.0
-
-	for i := 0; i < property.UpgradeLevel && i < len(property.Upgrades); i++ {
-		upgrade := property.Upgrades[i]
-		completionDate := upgrade.PurchaseDate.AddDate(0, 0, upgrade.DaysToComplete)
-
-		if completionDate.Before(monthStartDate) {
-			// Upgrade completed before the month starts; full RentIncrease applies
-			proratedUpgradeIncrease += upgrade.RentIncrease
-			// fmt.Printf("Upgrade %d completed before month start: +$%.2f\n", i+1, upgrade.RentIncrease)
-		} else if completionDate.Equal(monthStartDate) || completionDate.After(monthStartDate) && completionDate.Before(monthEndDate.AddDate(0, 0, 1)) {
-			// Upgrade completed during the month; prorate RentIncrease
-			// Calculate days after upgrade completion (inclusive of the day after completion)
-			daysAfterUpgrade := int(monthEndDate.Sub(completionDate).Hours() / 24) // Floor to int
-			if daysAfterUpgrade < 0 {
-				daysAfterUpgrade = 0
-			}
-			proratedIncrease := (upgrade.RentIncrease * float64(daysAfterUpgrade)) / daysInMonth
-			proratedIncrease = roundToNearest5(proratedIncrease)
-			proratedUpgradeIncrease += proratedIncrease
-			// fmt.Printf("Upgrade %d completed on %s: Prorated +$%.2f\n", i+1, completionDate.Format("2006-01-02"), proratedIncrease)
-		}
-		// Upgrades completed after the month are not included
-	}
-
-	// Calculate total prorated rent
-	totalProratedRent := proratedBaseRent + proratedUpgradeIncrease
-	totalProratedRent = roundToNearest5(totalProratedRent)
-
-	logProratedRentCalculation(property, daysInMonth, daysOwned, proratedBaseRent, proratedUpgradeIncrease, totalProratedRent)
-	return totalProratedRent
-}
-
-// logProratedRentCalculation logs details of the prorated rent calculation for debugging.
-func logProratedRentCalculation(property *models.Property, daysInMonth float64, daysOwned int, proratedBaseRent float64, proratedUpgradeIncrease float64, totalProratedRent float64) {
-	fmt.Printf("Calculating prorated rent for property: %s\n", property.Name)
-	fmt.Printf("Days in month: %.0f\n", daysInMonth)
-	fmt.Printf("Days owned in month: %d\n", daysOwned)
-	fmt.Printf("Prorated Base Rent: $%.2f\n", proratedBaseRent)
-	fmt.Printf("Prorated Upgrade Increases: $%.2f\n", proratedUpgradeIncrease)
-	fmt.Printf("Total Prorated Rent: $%.2f\n", totalProratedRent)
-}
-
-// distributeRentToOwner calculates and assigns rent to the owner of each property.
-func distributeRentToOwner(world *ecs.World, property *models.Property, rent float64) {
-	var ownerComp *components.PlayerComponent
-
-	// Iterate through all entities to find the player with matching Player.ID
+// processPartialMonth collects prorated rent for a partial month.
+func processPartialMonth(world *ecs.World, startDate, endDate time.Time) {
 	for _, entity := range world.Entities {
-		comp := entity.GetComponent("PlayerComponent")
-		if comp != nil {
-			playerComp := comp.(*components.PlayerComponent)
-			if playerComp.Player.ID == property.PlayerID {
-				ownerComp = playerComp
-				break
-			}
-		}
+		processEntityRent(world, entity, startDate, endDate, true)
 	}
+}
 
-	if ownerComp == nil {
-		fmt.Printf("Owner entity for player ID %d not found!\n", property.PlayerID)
+// processFullMonth collects full rent for a given month.
+func processFullMonth(world *ecs.World, startOfMonth, endOfMonth time.Time) {
+	for _, entity := range world.Entities {
+		processEntityRent(world, entity, startOfMonth, endOfMonth, false)
+	}
+}
+
+// processEntityRent calculates and distributes rent for a single entity.
+func processEntityRent(world *ecs.World, entity *ecs.Entity, startDate, endDate time.Time, isPartial bool) {
+	propComp := entity.GetComponent("PropertyComponent")
+	if propComp == nil {
 		return
 	}
 
-	ownerComp.Player.Funds += rent
-	// fmt.Printf("Distributed $%.2f to player %d. New funds: $%.2f\n", rent, ownerComp.Player.ID, ownerComp.Player.Funds)
+	property := propComp.(*components.PropertyComponent).Property
+	if !property.Owned {
+		return
+	}
+
+	if isPartial {
+		if property.PurchaseDate.After(endDate) {
+			return
+		}
+		collectProratedRent(world, property, startDate, endDate)
+	} else if property.PurchaseDate.Before(startDate) || property.PurchaseDate.Equal(startDate) {
+		collectFullRent(world, property, startDate, endDate)
+	} else {
+		collectProratedRent(world, property, startDate, endDate)
+	}
 }
 
-// roundToNearest5 rounds a number down to the nearest multiple of 5.
-func roundToNearest5(num float64) float64 {
-	rounded := math.Floor(num/5.0) * 5.0
-	return rounded
+// collectProratedRent calculates prorated rent for a property.
+func collectProratedRent(world *ecs.World, property *models.Property, startDate, endDate time.Time) {
+	daysOwned := calculateDaysOwned(startDate, endDate, property.PurchaseDate)
+	proratedRent := calculateProratedRent(property, float64(daysOwned), float64(daysInMonth(startDate)))
+	distributeRentToOwner(world, property, proratedRent)
 }
 
-// calculateMonthsPassed determines how many full months have passed between two dates.
+// collectFullRent calculates and distributes full rent for a property.
+func collectFullRent(world *ecs.World, property *models.Property, monthStart, monthEnd time.Time) {
+	fullRent := calculateFullRent(property, monthStart, monthEnd)
+	distributeRentToOwner(world, property, fullRent)
+}
+
+// calculateProratedRent computes prorated rent for a property, including upgrades.
+func calculateProratedRent(property *models.Property, daysOwned, daysInMonth float64) float64 {
+	baseProrated := (property.BaseRent * daysOwned) / daysInMonth
+	upgradeProrated := calculateUpgradeProration(property, daysOwned, daysInMonth)
+	return roundToNearest5(baseProrated + upgradeProrated)
+}
+
+// calculateFullRent computes full rent for a property, including upgrades.
+func calculateFullRent(property *models.Property, monthStart, monthEnd time.Time) float64 {
+	baseRent := property.BaseRent
+	upgradeIncrease := calculateUpgradeRent(property, monthStart, monthEnd)
+	return baseRent + upgradeIncrease
+}
+
+// calculateUpgradeRent computes the rent increase from upgrades for a given month.
+func calculateUpgradeRent(property *models.Property, monthStart, monthEnd time.Time) float64 {
+	total := 0.0
+	for _, upgrade := range property.Upgrades {
+		completionDate := upgrade.PurchaseDate.AddDate(0, 0, upgrade.DaysToComplete)
+		if completionDate.Before(monthStart) {
+			total += upgrade.RentIncrease
+		} else if completionDate.After(monthStart) && completionDate.Before(monthEnd.AddDate(0, 0, 1)) {
+			daysActive := float64(monthEnd.Sub(completionDate).Hours() / 24)
+			total += (upgrade.RentIncrease * daysActive) / float64(daysInMonth(monthStart))
+		}
+	}
+	return total
+}
+
+// calculateUpgradeProration computes prorated upgrade rent for a given month.
+func calculateUpgradeProration(property *models.Property, daysOwned, daysInMonth float64) float64 {
+	total := 0.0
+	for _, upgrade := range property.Upgrades {
+		completionDate := upgrade.PurchaseDate.AddDate(0, 0, upgrade.DaysToComplete)
+		if completionDate.Before(property.PurchaseDate) {
+			total += upgrade.RentIncrease
+		} else {
+			daysActive := daysOwned - float64(completionDate.Day())
+			if daysActive > 0 {
+				total += (upgrade.RentIncrease * daysActive) / daysInMonth
+			}
+		}
+	}
+	return total
+}
+
+func distributeRentToOwner(world *ecs.World, property *models.Property, rent float64) {
+	for _, entity := range world.Entities {
+		playerComp := entity.GetComponent("PlayerComponent")
+		if playerComp != nil && playerComp.(*components.PlayerComponent).Player.ID == property.PlayerID {
+			playerComp.(*components.PlayerComponent).Player.Funds += rent
+			return
+		}
+	}
+}
+
 func calculateMonthsPassed(lastUpdated, currentDate time.Time) int {
-	// fmt.Printf("Calculating months passed from %s to %s\n", lastUpdated.Format("2006-01-02"), currentDate.Format("2006-01-02"))
-
 	if currentDate.Before(lastUpdated) {
-		fmt.Println("Current date is before last updated date; months passed: 0")
 		return 0
 	}
 
 	monthsPassed := 0
-	firstOfNextMonth := time.Date(lastUpdated.Year(), lastUpdated.Month(), 1, 0, 0, 0, 0, lastUpdated.Location()).AddDate(0, 1, 0)
-
-	for !firstOfNextMonth.After(currentDate) {
+	nextMonth := nextMonthStart(lastUpdated)
+	for !nextMonth.After(currentDate) {
 		monthsPassed++
-		firstOfNextMonth = firstOfNextMonth.AddDate(0, 1, 0)
-		// Add limit to prevent excessive iteration
-		if monthsPassed > 1200 { // Example cap at 100 years
-			fmt.Println("Exceeded max months count, breaking out of loop")
-			break
-		}
+		nextMonth = nextMonth.AddDate(0, 1, 0)
 	}
 	return monthsPassed
 }
 
-// Helper function to get number of days in a month
+func calculateDaysOwned(startDate, endDate, purchaseDate time.Time) int {
+	if purchaseDate.Before(startDate) {
+		return int(endDate.Sub(startDate).Hours()/24) + 1
+	}
+	return int(endDate.Sub(purchaseDate).Hours() / 24)
+}
+
+func roundToNearest5(value float64) float64 {
+	return math.Floor(value/5) * 5
+}
+
 func daysInMonth(date time.Time) int {
 	return date.AddDate(0, 1, -date.Day()).Day()
+}
+
+func nextMonthStart(date time.Time) time.Time {
+	return time.Date(date.Year(), date.Month(), 1, 0, 0, 0, 0, date.Location()).AddDate(0, 1, 0)
+}
+
+func monthEnd(date time.Time) time.Time {
+	return date.AddDate(0, 1, -date.Day())
+}
+
+func isPartialMonth(date time.Time) bool {
+	return date.Day() != daysInMonth(date)
 }

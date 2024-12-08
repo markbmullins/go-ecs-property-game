@@ -26,7 +26,10 @@ func GetWillowFlatsNeighborhood() *models.Neighborhood {
 	}
 }
 
-// WillowResidential defines the residential properties for Willow Flats.
+func GetWillowFlatsProperties() []models.Property {
+	return append(WillowResidential, WillowCommercial...)
+}
+
 var WillowResidential = []models.Property{
 	{
 		ID:                           81,
@@ -250,7 +253,6 @@ var WillowResidential = []models.Property{
 	},
 }
 
-// WillowCommercial defines the commercial properties for Willow Flats.
 var WillowCommercial = []models.Property{
 	{
 		ID:                           91,
@@ -474,7 +476,6 @@ var WillowCommercial = []models.Property{
 	},
 }
 
-// Helper functions to define upgrade paths
 func willowResidentialUpgradePaths() map[string][]models.Upgrade {
 	return map[string][]models.Upgrade{
 		"Basic Enhancements": {

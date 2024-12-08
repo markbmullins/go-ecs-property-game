@@ -26,8 +26,10 @@ func GetDowntownDistrictNeighborhood() *models.Neighborhood {
 	}
 }
 
+func GetDowntownProperties() []models.Property {
+	return append(DowntownResidential, DowntownCommercial...)
+}
 
-// DowntownResidential defines the residential properties for Downtown District.
 var DowntownResidential = []models.Property{
 	{
 		ID:                           1,
@@ -251,7 +253,6 @@ var DowntownResidential = []models.Property{
 	},
 }
 
-// DowntownCommercial defines the commercial properties for Downtown District.
 var DowntownCommercial = []models.Property{
 	{
 		ID:                           11,
@@ -475,7 +476,6 @@ var DowntownCommercial = []models.Property{
 	},
 }
 
-// Helper functions to define upgrade paths
 func downtownResidentialUpgradePaths() map[string][]models.Upgrade {
 	return map[string][]models.Upgrade{
 		"Modernization": {

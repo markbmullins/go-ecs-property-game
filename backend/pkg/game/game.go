@@ -1,14 +1,13 @@
 package game
 
 import (
-	"log"
+	"slices"
 	"time"
 
 	"github.com/markbmullins/city-developer/pkg/components"
 	"github.com/markbmullins/city-developer/pkg/ecs"
 	"github.com/markbmullins/city-developer/pkg/models"
 	"github.com/markbmullins/city-developer/pkg/neighborhoods"
-	"github.com/markbmullins/city-developer/pkg/properties"
 	"github.com/markbmullins/city-developer/pkg/systems"
 )
 
@@ -17,10 +16,11 @@ func InitializeGame() *ecs.World {
 
 	initialDate := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
 	gameTimeModel := &models.GameTime{
-		CurrentDate:     initialDate,
-		LastUpdated:     initialDate,
-		IsPaused:        false,
-		SpeedMultiplier: 1.0,
+		CurrentDate:       initialDate,
+		LastUpdated:       initialDate,
+		IsPaused:          false,
+		SpeedMultiplier:   1.0,
+		RentCollectionDay: 1,
 	}
 
 	// Add game time as a component to the world
@@ -45,68 +45,36 @@ func InitializeGame() *ecs.World {
 		neighborhoods.GetWillowFlatsNeighborhood(),
 	}
 
-	// Initialize the property registry
-	propertyRegistry := properties.NewPropertyRegistry()
+	allProperties := slices.Concat(neighborhoods.GetDowntownProperties(),
+		neighborhoods.GetHistoricHeightsProperties(),
+		neighborhoods.GetTechValleyProperties(),
+		neighborhoods.GetCedarGroveProperties(),
+		neighborhoods.GetWillowFlatsProperties())
 
 	// Add properties to the ECS world
-	for _, property := range propertyRegistry.GetAllProperties() {
-		if err := addPropertyToWorld(world, property); err != nil {
-			log.Printf("Error adding property ID %d: %v", property.ID, err)
-		}
+	for _, property := range allProperties {
+		addPropertyToWorld(world, &property)
 	}
 
 	// Initialize and add systems
-	neighborhoodSystem := &systems.NeighborhoodValueSystem{
+	neighborhoodValueSystem := &systems.NeighborhoodValueSystem{
 		Neighborhoods: getNeighborhoodMap(allNeighborhoods),
 	}
 
 	world.AddSystem(&systems.IncomeSystem{})
-	world.AddSystem(neighborhoodSystem)
+	world.AddSystem(neighborhoodValueSystem)
 	world.AddSystem(&systems.PropertyManagementSystem{})
 	world.AddSystem(&systems.TimeSystem{})
 
 	return world
 }
 
-// addPropertyToWorld adds a property entity to the ECS world
-func addPropertyToWorld(world *ecs.World, prop models.Property) {
-	// Create a new entity for the property using its unique ID
-	propertyEntity := ecs.NewEntity(prop.ID)
-
-	// Add PropertyComponent
-	propertyComponent := &components.PropertyComponent{
-		Property: &prop, // Assuming PropertyComponent holds a pointer to Property
-	}
-	propertyEntity.AddComponent("PropertyComponent", propertyComponent)
-
-	// Add other necessary components here if needed
-
-	// Add Entity to World
-	world.AddEntity(propertyEntity)
-}
-
-// Placeholder for property retrieval by ID
-func getPropertyByID(id int) *models.Property {
-	// Implement this function to retrieve a property by its ID from all neighborhoods
-	// Example implementation:
-	allNeighborhoods := []*models.Neighborhood{
-		neighborhoods.GetDowntownDistrictNeighborhood(),
-		neighborhoods.GetHistoricHeightsNeighborhood(),
-		neighborhoods.GetTechValleyNeighborhood(),
-		neighborhoods.GetCedarGroveNeighborhood(),
-		neighborhoods.GetWillowFlatsNeighborhood(),
-	}
-
-	for _, neighborhood := range allNeighborhoods {
-		for _, propID := range neighborhood.PropertyIDs {
-			if propID == id {
-				// Retrieve the property from the respective slice
-				// Implement the actual retrieval logic based on your property storage
-			}
-		}
-	}
-
-	return nil
+func addPropertyToWorld(world *ecs.World, prop *models.Property) {
+	entity := ecs.NewEntity(prop.ID)
+	entity.AddComponent("PropertyComponent", &components.PropertyComponent{
+		Property: prop,
+	})
+	world.AddEntity(entity)
 }
 
 // getNeighborhoodMap creates a map of Neighborhood ID to Neighborhood pointer

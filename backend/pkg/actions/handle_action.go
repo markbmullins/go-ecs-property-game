@@ -95,8 +95,11 @@ func handleBuyProperty(world *ecs.World, payload interface{}, w http.ResponseWri
 	propertyID := int(data["property_id"].(float64))
 	playerID := int(data["player_id"].(float64))
 
-	playerEntity, playerFound := world.Entities[playerID]
-	propertyEntity, propertyFound := world.Entities[propertyID]
+	playerEntity := world.GetEntity(playerID)
+	propertyEntity := world.GetEntity(propertyID)
+
+	playerFound := playerEntity != nil
+	propertyFound := propertyEntity != nil
 	gameTime, gameTimeFoundErr := utils.GetCurrentGameTime(world)
 
 	if !playerFound || !propertyFound {
@@ -148,7 +151,8 @@ func handleUpgradeProperty(world *ecs.World, payload interface{}, w http.Respons
 	}
 
 	// Retrieve the property entity
-	propertyEntity, propertyFound := world.Entities[propertyID]
+	propertyEntity := world.GetEntity(propertyID)
+	propertyFound := propertyEntity != nil
 	if !propertyFound {
 		utils.SendResponse(w, "error", "Property not found", nil, http.StatusNotFound)
 		return
@@ -180,7 +184,8 @@ func handleUpgradeProperty(world *ecs.World, payload interface{}, w http.Respons
 	nextUpgrade := upgradePath[currentLevel+1]
 
 	// Retrieve the owner entity
-	ownerEntity, ownerFound := world.Entities[propComp.Property.PlayerID]
+	ownerEntity := world.GetEntity(propComp.Property.PlayerID)
+	ownerFound := ownerEntity != nil
 	if !ownerFound {
 		utils.SendResponse(w, "error", "Owner not found", nil, http.StatusNotFound)
 		return
@@ -266,16 +271,18 @@ func handleSellProperty(world *ecs.World, payload interface{}, w http.ResponseWr
 	}
 
 	propertyID := int(data["property_id"].(float64))
-	propertyEntity, propertyFound := world.Entities[propertyID]
+	propertyEntity := world.GetEntity(propertyID)
 
+	propertyFound := propertyEntity != nil
 	if !propertyFound {
 		utils.SendResponse(w, "error", "Property not found", nil, http.StatusNotFound)
 		return
 	}
 
 	propertyComp := propertyEntity.GetComponent("PropertyComponent").(*components.PropertyComponent)
-	ownerEntity, ownerFound := world.Entities[propertyComp.Property.PlayerID]
+	ownerEntity := world.GetEntity(propertyComp.Property.PlayerID)
 
+	ownerFound := ownerEntity != nil
 	if ownerFound && propertyComp.Property.Owned {
 		ownerComp := ownerEntity.GetComponent("PlayerComponent").(*components.PlayerComponent)
 		salePrice := propertyComp.Property.Price * 0.8

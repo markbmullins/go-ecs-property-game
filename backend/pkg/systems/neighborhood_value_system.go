@@ -9,47 +9,47 @@ import (
 )
 
 type NeighborhoodValueSystem struct {
-    Neighborhoods map[int]*models.Neighborhood
+	Neighborhoods map[int]*models.Neighborhood
 }
 
 // Update calculates the neighborhood value and applies rent boosts if applicable.
 func (s *NeighborhoodValueSystem) Update(world *ecs.World) {
-    for _, neighborhood := range s.Neighborhoods {
-        totalValue := 0.0
-        upgradedCount := 0
-        totalProperties := len(neighborhood.PropertyIDs)
+	for _, neighborhood := range s.Neighborhoods {
+		totalValue := 0.0
+		upgradedCount := 0
+		totalProperties := len(neighborhood.PropertyIDs)
 
-        for _, propID := range neighborhood.PropertyIDs {
-            propertyEntity, found := world.Entities[propID]
-            if !found {
-                continue
-            }
+		for _, propID := range neighborhood.PropertyIDs {
+			propertyEntity, found := world.Entities[propID]
+			if !found {
+				continue
+			}
 
-            propComp := propertyEntity.GetComponent("PropertyComponent").(*components.PropertyComponent)
-            property := propComp.Property
-            totalValue += property.Price
+			propComp := propertyEntity.GetComponent("PropertyComponent").(*components.PropertyComponent)
+			property := propComp.Property
+			totalValue += property.Price
 
-            if property.UpgradeLevel > 0 {
-                upgradedCount++
-            }
-        }
+			if property.UpgradeLevel > 0 {
+				upgradedCount++
+			}
+		}
 
-        neighborhood.AveragePropertyValue = totalValue / float64(totalProperties)
-        upgradedPercentage := float64(upgradedCount) / float64(totalProperties) * 100
+		neighborhood.AveragePropertyValue = totalValue / float64(totalProperties)
+		upgradedPercentage := float64(upgradedCount) / float64(totalProperties) * 100
 
-        if upgradedPercentage > neighborhood.RentBoostThreshold {
-            for _, propID := range neighborhood.PropertyIDs {
-                propertyEntity, found := world.Entities[propID]
-                if !found {
-                    continue
-                }
+		if upgradedPercentage > neighborhood.RentBoostThreshold {
+			for _, propID := range neighborhood.PropertyIDs {
+				propertyEntity, found := world.Entities[propID]
+				if !found {
+					continue
+				}
 
-                propComp := propertyEntity.GetComponent("PropertyComponent").(*components.PropertyComponent)
-                property := propComp.Property
-                property.RentBoost = neighborhood.RentBoostAmount
-                fmt.Printf("Applied rent boost of %.2f%% to property %s in neighborhood %s\n",
-                    neighborhood.RentBoostAmount, property.Name, neighborhood.Name)
-            }
-        }
-    }
+				propComp := propertyEntity.GetComponent("PropertyComponent").(*components.PropertyComponent)
+				property := propComp.Property
+				property.RentBoost = neighborhood.RentBoostAmount
+				fmt.Printf("Applied rent boost of %.2f%% to property %s in neighborhood %s\n",
+					neighborhood.RentBoostAmount, property.Name, neighborhood.Name)
+			}
+		}
+	}
 }
