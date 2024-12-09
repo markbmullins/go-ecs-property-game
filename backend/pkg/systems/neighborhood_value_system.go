@@ -20,8 +20,8 @@ func (s *NeighborhoodValueSystem) Update(world *ecs.World) {
 
 		// Calculate the total neighborhood value
 		for _, propID := range neighborhood.PropertyIDs {
-			propertyEntity, found := world.Entities[propID]
-			if !found {
+			propertyEntity := world.GetProperty(propID)
+			if propertyEntity == nil {
 				continue
 			}
 
@@ -38,8 +38,8 @@ func (s *NeighborhoodValueSystem) Update(world *ecs.World) {
 
 		if upgradedPercentage > neighborhood.RentBoostThreshold {
 			for _, propID := range neighborhood.PropertyIDs {
-				propertyEntity, found := world.Entities[propID]
-				if !found {
+				propertyEntity := world.GetProperty(propID)
+				if propertyEntity != nil {
 					continue
 				}
 

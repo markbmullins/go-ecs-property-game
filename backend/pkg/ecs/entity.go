@@ -1,21 +1,42 @@
 package ecs
 
+import "fmt"
+
+type ComponentName = string
+type EntityName = string
 type Entity struct {
-    ID         int
-    Components map[string]Component
+	ID         EntityKey
+	Components map[ComponentName]Component
 }
 
-func NewEntity(id int) *Entity {
-    return &Entity{
-        ID:         id,
-        Components: make(map[string]Component),
-    }
+type EntityKey struct {
+    EntityType EntityName
+    ID         int
+}
+
+func NewEntityKey(entityType string, id int) string {
+    return fmt.Sprintf("%s-%d", entityType, id)
+}
+
+func (k EntityKey) ToString() string {
+    return fmt.Sprintf("%s-%d", k.EntityType, k.ID)
+}
+
+func (w *World) GetEntity(key EntityKey) *Entity {
+    return w.Entities[key.ToString()]
+}
+
+func NewEntity(entityType string, id int) *Entity {
+	return &Entity{
+		ID:         EntityKey{EntityType: entityType, ID: id},
+		Components: make(map[string]Component),
+	}
 }
 
 func (e *Entity) AddComponent(name string, component Component) {
-    e.Components[name] = component
+	e.Components[name] = component
 }
 
 func (e *Entity) GetComponent(name string) Component {
-    return e.Components[name]
+	return e.Components[name]
 }

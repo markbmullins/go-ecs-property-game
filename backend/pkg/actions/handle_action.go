@@ -94,8 +94,8 @@ func handleBuyProperty(world *ecs.World, payload interface{}, w http.ResponseWri
 	propertyID := int(data["property_id"].(float64))
 	playerID := int(data["player_id"].(float64))
 
-	playerEntity := world.GetEntity(playerID)
-	propertyEntity := world.GetEntity(propertyID)
+	playerEntity := world.GetPlayer(playerID)
+	propertyEntity := world.GetProperty(propertyID)
 
 	playerFound := playerEntity != nil
 	propertyFound := propertyEntity != nil
@@ -150,7 +150,7 @@ func handleUpgradeProperty(world *ecs.World, payload interface{}, w http.Respons
 	}
 
 	// Retrieve the property entity
-	propertyEntity := world.GetEntity(propertyID)
+	propertyEntity := world.GetProperty(propertyID)
 	propertyFound := propertyEntity != nil
 	if !propertyFound {
 		utils.SendResponse(w, "error", "Property not found", nil, http.StatusNotFound)
@@ -183,7 +183,7 @@ func handleUpgradeProperty(world *ecs.World, payload interface{}, w http.Respons
 	nextUpgrade := upgradePath[currentLevel+1]
 
 	// Retrieve the owner entity
-	ownerEntity := world.GetEntity(property.PlayerID)
+	ownerEntity := world.GetPlayer(property.PlayerID)
 	ownerFound := ownerEntity != nil
 	if !ownerFound {
 		utils.SendResponse(w, "error", "Owner not found", nil, http.StatusNotFound)
@@ -267,7 +267,7 @@ func handleSellProperty(world *ecs.World, payload interface{}, w http.ResponseWr
 	}
 
 	propertyID := int(data["property_id"].(float64))
-	propertyEntity := world.GetEntity(propertyID)
+	propertyEntity := world.GetProperty(propertyID)
 
 	propertyFound := propertyEntity != nil
 	if !propertyFound {
@@ -276,7 +276,7 @@ func handleSellProperty(world *ecs.World, payload interface{}, w http.ResponseWr
 	}
 
 	property := propertyEntity.GetComponent("Property").(*components.Property)
-	ownerEntity := world.GetEntity(property.PlayerID)
+	ownerEntity := world.GetPlayer(property.PlayerID)
 
 	ownerFound := ownerEntity != nil
 	if ownerFound && property.Owned {

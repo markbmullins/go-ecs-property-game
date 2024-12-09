@@ -40,7 +40,7 @@ var allProperties = slices.Concat(
 )
 
 func initializeGameTime(world *ecs.World, initialDate time.Time) {
-	timeEntity := ecs.NewEntity(0)
+	timeEntity := ecs.NewEntity("GameTime", 0)
 	timeEntity.AddComponent("GameTime", &components.GameTime{
 		CurrentDate:       initialDate,
 		LastUpdated:       initialDate,
@@ -52,7 +52,7 @@ func initializeGameTime(world *ecs.World, initialDate time.Time) {
 }
 
 func initializePlayer(world *ecs.World) {
-	playerEntity := ecs.NewEntity(1)
+	playerEntity := ecs.NewEntity("Player", 1)
 	playerEntity.AddComponent("Player", &components.Player{
 		ID:         1,
 		Funds:      10000,
@@ -64,7 +64,7 @@ func initializePlayer(world *ecs.World) {
 
 func initializeProperties(world *ecs.World) {
 	for _, property := range allProperties {
-		entity := ecs.NewEntity(property.ID)
+		entity := ecs.NewEntity("Property",property.ID)
 		entity.AddComponent("Property", property)
 		world.AddEntity(entity)
 	}
@@ -74,7 +74,7 @@ func initializeNeighborhoods(world *ecs.World) {
 	neighborhoodMap := make(map[int]*components.Neighborhood)
 	for _, neighborhood := range allNeighborhoods {
 		neighborhoodMap[neighborhood.ID] = neighborhood
-		neighborhoodEntity := ecs.NewEntity(neighborhood.ID)
+		neighborhoodEntity := ecs.NewEntity("Neighborhood", neighborhood.ID)
 		neighborhoodEntity.AddComponent("Neighborhood", neighborhood)
 		world.AddEntity(neighborhoodEntity)
 	}
