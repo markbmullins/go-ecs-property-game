@@ -6,7 +6,7 @@ export interface World {
 }
 
 export interface Entity {
-  ID: number;
+  ID: {ID: number; EntityType: string};
   Components: Record<string, Component>;
 }
 

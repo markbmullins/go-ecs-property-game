@@ -13,8 +13,10 @@ h4 {
 }
 
 .App {
-  max-width: 800px;
-  margin: 0 auto;
+  padding: 1rem 5rem;
+}
+.game-state {
+  color: white;
 }
 
 .game-state,
@@ -58,4 +60,47 @@ button {
 
 .error {
   color: red;
+}
+
+.neighborhood-section {
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+  padding: 15px;
+}
+
+.property-card {
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  color: #787676;
+}
+
+.upgrade-paths ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.upgrade-paths {
+  display: flex;
+  flex-direction: column;
+}
+
+.upgrade-paths button {
+  margin-bottom: 5px;
+  max-width: 200px;
+}
+
+.upgrade-path h6 {
+  margin: 0;
+}
+
+.neighborhood-section {
+  color: #f9f9f9;
+  width: 100%;
+}
+
+.property-grid {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
 }

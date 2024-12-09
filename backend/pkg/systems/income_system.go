@@ -12,37 +12,39 @@ import (
 
 /*
 ===========================================================
-                     INCOME SYSTEM
+
+	INCOME SYSTEM
+
 ===========================================================
 
 1. **Purchase Mechanics**
-   - **No Rent on Purchase Day:** Rent is not collected on the day a property is purchased.
-   - **Rent Collection Start:** Begins the day after the purchase date.
-   - **First Month Proration:**
-     - *First Day Purchase:* Full rent minus one day.
-		 - *Mid Month Purchase:* Rent is collected from the day after purchase until the end of the month
-     - *Last Day Purchase:* Prorated rent is 0; full rent starts the next month.
+  - **No Rent on Purchase Day:** Rent is not collected on the day a property is purchased.
+  - **Rent Collection Start:** Begins the day after the purchase date.
+  - **First Month Proration:**
+  - *First Day Purchase:* Full rent minus one day.
+  - *Mid Month Purchase:* Rent is collected from the day after purchase until the end of the month
+  - *Last Day Purchase:* Prorated rent is 0; full rent starts the next month.
 
 2. **Upgrade Mechanics**
-   - **No Rent Increase on Completion Day:** Rent increase from upgrades does not apply on the upgrade completion day.
-   - **Rent Increase Start:** Begins the day after the upgrade completion date.
-   - **Mid-Month Upgrades:** Rent increases are prorated based on active days, excluding the completion day.
-   - **Multiple Upgrades:** Each upgrade's rent increase is prorated based on its respective completion date.
+  - **No Rent Increase on Completion Day:** Rent increase from upgrades does not apply on the upgrade completion day.
+  - **Rent Increase Start:** Begins the day after the upgrade completion date.
+  - **Mid-Month Upgrades:** Rent increases are prorated based on active days, excluding the completion day.
+  - **Multiple Upgrades:** Each upgrade's rent increase is prorated based on its respective completion date.
 
 3. **Rent Collection Rules**
-   - **Prorated Rent Calculation:** Based on days owned/upgraded, excluding purchase and upgrade completion days.
-   - **Full Rent Collection:** After a full month has elapsed (excluding purchase day), full rent including upgrades is collected.
-   - **Rent Composition:**
-     - *Base Rent:* Defined per property.
-     - *Upgrade Increases:* Added based on each upgrade's RentIncrease value.
-     - *Total Rent:* Sum of Base Rent and all applicable Upgrade Increases.
+  - **Prorated Rent Calculation:** Based on days owned/upgraded, excluding purchase and upgrade completion days.
+  - **Full Rent Collection:** After a full month has elapsed (excluding purchase day), full rent including upgrades is collected.
+  - **Rent Composition:**
+  - *Base Rent:* Defined per property.
+  - *Upgrade Increases:* Added based on each upgrade's RentIncrease value.
+  - *Total Rent:* Sum of Base Rent and all applicable Upgrade Increases.
 
 4. **Time Advancement Considerations**
-   - **Variable Speeds:** Supports multiple time advancement speeds, including cycles exceeding 30 days.
-   - **Accurate Proration:** Rent calculations adjust based on the actual number of days elapsed, regardless of time speed.
+  - **Variable Speeds:** Supports multiple time advancement speeds, including cycles exceeding 30 days.
+  - **Accurate Proration:** Rent calculations adjust based on the actual number of days elapsed, regardless of time speed.
 
 5. **Edge Case Handling**
-   - **Calendar Variations:** Correctly handles months with 28-31 days and leap years (February with 29 days).
+  - **Calendar Variations:** Correctly handles months with 28-31 days and leap years (February with 29 days).
 
 **Key Rules Summary:**
 - No rent is collected on Purchase Day or Upgrade Completion Day.
@@ -54,6 +56,7 @@ import (
 ===========================================================
 */
 type IncomeSystem struct{}
+
 // Update triggers the rent collection process, handling fast-forwarding of time.
 func (s *IncomeSystem) Update(world *ecs.World) {
 	gameTime, err := utils.GetCurrentGameTime(world)
@@ -90,21 +93,34 @@ func processRent(world *ecs.World, lastUpdated time.Time, monthsPassed int) {
 }
 
 func processMonth(world *ecs.World, startDate, endDate time.Time) {
-	for _, entity := range world.Entities {
-		processEntityRent(world, entity, startDate, endDate)
-	}
-}
+	playerEntities := utils.GetPlayers(world)
 
-func processEntityRent(world *ecs.World, entity *ecs.Entity, startDate, endDate time.Time) {
-	property := entity.GetComponent("Property").(*components.Property)
+	for _, playerEntity := range playerEntities {
+		playerComponent := playerEntity.GetComponent("Player")
+		if playerComponent == nil {
+			continue
+		}
 
-	if !property.Owned {
-		return
-	}
+		player := playerComponent.(*components.Player)
+		if len(player.Properties) == 0 {
+			// Skip players without properties
+			continue
+		}
 
-	rent := calculateMonthlyRent(property, startDate, endDate)
-	if rent > 0 {
-		distributeRentToOwner(world, property, rent)
+		for _, playerProperty := range player.Properties {
+			propertyEntity := world.GetProperty(playerProperty.ID)
+			if propertyEntity == nil {
+				continue
+			}
+
+			property := propertyEntity.GetComponent("Property").(*components.Property)
+			if property != nil && property.Owned {
+				rent := calculateMonthlyRent(property, startDate, endDate)
+				if rent > 0 {
+					distributeRentToOwner(world, property, rent)
+				}
+			}
+		}
 	}
 }
 
@@ -133,7 +149,7 @@ func calculateMonthlyRent(property *components.Property, monthStart, monthEnd ti
 	propertyRentDays := countDaysInRange(propertyRentStartDate, monthEnd)
 
 	// Calculate daily base rent by dividing the base rent by the total days in the month.
-	baseDailyRent := (property.BaseRent + property.RentBoost)/ daysInCurrentMonth
+	baseDailyRent := (property.BaseRent + property.RentBoost) / daysInCurrentMonth
 
 	totalBaseRent := (baseDailyRent * float64(propertyRentDays))
 
@@ -174,16 +190,33 @@ func calculateMonthlyRent(property *components.Property, monthStart, monthEnd ti
 	return roundToNearest5(totalRent)
 }
 
-
-// distribute rent to correct player
 func distributeRentToOwner(world *ecs.World, property *components.Property, rent float64) {
-	for _, entity := range world.Entities {
-		player := entity.GetComponent("Player").(*components.Player)
-		if player != nil && player.ID == property.PlayerID {
+	// Get all player entities from the world
+	playerEntities := utils.GetPlayers(world)
+
+	for _, playerEntity := range playerEntities {
+		// Safely retrieve the Player component
+		playerComponent := playerEntity.GetComponent("Player")
+		if playerComponent == nil {
+			continue
+		}
+
+		// Assert the component to *components.Player
+		player, ok := playerComponent.(*components.Player)
+		if !ok {
+			continue
+		}
+
+		// Check if this player owns the property
+		if player.ID == property.PlayerID {
 			player.Funds += rent
+			fmt.Printf("Rent of %.2f distributed to player ID %d\n", rent, player.ID)
 			return
 		}
 	}
+
+	// Log a warning if no matching player is found
+	fmt.Printf("Warning: No player found owning property ID %d\n", property.ID)
 }
 
 func calculateMonthsPassed(lastUpdated, currentDate time.Time) int {

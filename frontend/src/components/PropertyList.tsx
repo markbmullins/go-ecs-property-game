@@ -2,7 +2,7 @@
 
 import React from "react";
 import { performAction } from "../api";
-import { World, Property } from "../types";
+import { World, Property, Neighborhood } from "../types";
 
 interface PropertyListProps {
   gameState: World;
@@ -14,9 +14,22 @@ const PropertyList: React.FC<PropertyListProps> = ({
   onActionComplete,
 }) => {
   const entities = Object.values(gameState.Entities);
-  const properties = entities.filter(
-    (entity) => "Property" in entity.Components
-  );
+
+  // Extract neighborhoods and properties
+  const neighborhoods = entities
+    .filter((entity) => "Neighborhood" in entity.Components)
+    .map((entity) => entity.Components.Neighborhood as Neighborhood);
+  const properties = entities
+    .filter((entity) => "Property" in entity.Components)
+    .map((entity) => entity.Components.Property as Property);
+
+  // Group properties by neighborhood
+  const groupedProperties = neighborhoods.map((neighborhood) => {
+    const neighborhoodProperties = properties.filter(
+      (property) => property.NeighborhoodID === neighborhood.ID
+    );
+    return { neighborhood, properties: neighborhoodProperties };
+  });
 
   const playerID = 1; // Assuming the player's entity ID is 1
 
@@ -70,57 +83,75 @@ const PropertyList: React.FC<PropertyListProps> = ({
 
   return (
     <div className="property-list">
-      <h2>Properties</h2>
-      {properties.map((propertyEntity) => {
-        const property = propertyEntity.Components.Property as Property;
-        const owned = property.Owned;
-        const propertyID = property.ID;
-
-        return (
-          <div key={propertyID} className="property-card">
-            <h3>{property.Name}</h3>
-            <p>
-              <strong>Type:</strong> {property.Type}
-            </p>
-            <p>
-              <strong>Subtype:</strong> {property.Subtype}
-            </p>
-            <p>
-              <strong>Price:</strong> ${property.Price}
-            </p>
-            <p>
-              <strong>Base Rent:</strong> ${property.BaseRent}
-            </p>
-            <p>
-              <strong>Owned:</strong> {owned ? "Yes" : "No"}
-            </p>
-            {owned ? (
-              <div className="owned-actions">
-                <button onClick={() => handleSellProperty(propertyID)}>
-                  Sell Property
-                </button>
-                <div className="upgrade-paths">
-                  <h4>Upgrade Paths</h4>
-                  {Object.keys(property.UpgradePaths).map((pathName) => (
-                    <button
-                      key={pathName}
-                      onClick={() =>
-                        handleUpgradeProperty(propertyID, pathName)
-                      }
-                    >
-                      Upgrade {pathName}
+      <h2>Properties by Neighborhood</h2>
+      {groupedProperties.map(({ neighborhood, properties }) => (
+        <div key={neighborhood.ID} className="neighborhood-section">
+          <h3>{neighborhood.Name}</h3>
+          <p>
+            <strong>Average Property Value:</strong> $
+            {neighborhood.AveragePropertyValue.toLocaleString()}
+          </p>
+          <p>
+            <strong>Rent Boost Threshold:</strong>{" "}
+            {neighborhood.RentBoostThreshold}%
+          </p>
+          <p>
+            <strong>Rent Boost Percent:</strong> {neighborhood.RentBoostPercent}
+            %
+          </p>
+          <div className="property-grid">
+            {properties.length > 0 ? (
+              properties.map((property) => (
+                <div key={property.ID} className="property-card">
+                  <h4>{property.Name}</h4>
+                  <p>
+                    <strong>Type:</strong> {property.Type}
+                  </p>
+                  <p>
+                    <strong>Subtype:</strong> {property.Subtype}
+                  </p>
+                  <p>
+                    <strong>Price:</strong> ${property.Price.toLocaleString()}
+                  </p>
+                  <p>
+                    <strong>Base Rent:</strong> $
+                    {property.BaseRent.toLocaleString()}
+                  </p>
+                  <p>
+                    <strong>Owned:</strong> {property.Owned ? "Yes" : "No"}
+                  </p>
+                  {property.Owned ? (
+                    <div className="owned-actions">
+                      <button onClick={() => handleSellProperty(property.ID)}>
+                        Sell Property
+                      </button>
+                      <div className="upgrade-paths">
+                        <h4>Upgrade Paths</h4>
+                        {Object.keys(property.UpgradePaths).map((pathName) => (
+                          <button
+                            key={pathName}
+                            onClick={() =>
+                              handleUpgradeProperty(property.ID, pathName)
+                            }
+                          >
+                            Upgrade {pathName}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <button onClick={() => handleBuyProperty(property.ID)}>
+                      Buy Property
                     </button>
-                  ))}
+                  )}
                 </div>
-              </div>
+              ))
             ) : (
-              <button onClick={() => handleBuyProperty(propertyID)}>
-                Buy Property
-              </button>
+              <p>No properties available in this neighborhood.</p>
             )}
           </div>
-        );
-      })}
+        </div>
+      ))}
     </div>
   );
 };

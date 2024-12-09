@@ -15,7 +15,7 @@ type Response struct {
 }
 
 // SendResponse is a helper function to send JSON responses.
-func SendResponse(w http.ResponseWriter, statusCode int, message string, data interface{}, httpStatusCode int) {
+func SendResponse(w http.ResponseWriter, statusCode int, message string, data interface{}) {
 	response := Response{
 		StatusCode: statusCode,
 		Message:    message,
@@ -23,6 +23,5 @@ func SendResponse(w http.ResponseWriter, statusCode int, message string, data in
 	}
 	w.WriteHeader(statusCode)
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(httpStatusCode)
 	json.NewEncoder(w).Encode(response)
 }
