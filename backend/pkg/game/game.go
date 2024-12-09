@@ -55,7 +55,7 @@ func initializePlayer(world *ecs.World) {
 	playerEntity := ecs.NewEntity("Player", 1)
 	playerEntity.AddComponent("Player", &components.Player{
 		ID:         1,
-		Funds:      10000,
+		Funds:      100000000,
 		Properties: []*components.Property{},
 	})
 	world.AddEntity(playerEntity)
@@ -65,7 +65,7 @@ func initializePlayer(world *ecs.World) {
 func initializeProperties(world *ecs.World) {
 	for _, property := range allProperties {
 		entity := ecs.NewEntity("Property",property.ID)
-		entity.AddComponent("Property", property)
+		entity.AddComponent("Property", &property)
 		world.AddEntity(entity)
 	}
 }
@@ -75,7 +75,7 @@ func initializeNeighborhoods(world *ecs.World) {
 	for _, neighborhood := range allNeighborhoods {
 		neighborhoodMap[neighborhood.ID] = neighborhood
 		neighborhoodEntity := ecs.NewEntity("Neighborhood", neighborhood.ID)
-		neighborhoodEntity.AddComponent("Neighborhood", neighborhood)
+		neighborhoodEntity.AddComponent("Neighborhood", &neighborhood)
 		world.AddEntity(neighborhoodEntity)
 	}
 }

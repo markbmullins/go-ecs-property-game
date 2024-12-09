@@ -12,7 +12,7 @@ type NeighborhoodValueSystem struct{}
 
 // Update calculates the neighborhood value and applies rent boosts if applicable.
 func (s *NeighborhoodValueSystem) Update(world *ecs.World) {
-	neighborhoods := utils.GetNeighorhoodEntities(world)
+	neighborhoods := utils.GetNeighborhoodEntities(world)
 	for _, neighborhood := range neighborhoods {
 		totalValue := 0.0
 		upgradedCount := 0
@@ -25,7 +25,7 @@ func (s *NeighborhoodValueSystem) Update(world *ecs.World) {
 				continue
 			}
 
-			property := propertyEntity.GetComponent("Property").(*components.Property)
+			property := propertyEntity.GetComponent("Property").(components.Property)
 			totalValue += property.Price
 
 			if len(property.Upgrades) > 0 {

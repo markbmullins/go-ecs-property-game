@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/markbmullins/city-developer/pkg/components"
@@ -137,6 +138,7 @@ func handleBuyProperty(world *ecs.World, data BuyPropertyPayload, w http.Respons
 	player := playerEntity.GetComponent("Player").(*components.Player)
 	property := propertyEntity.GetComponent("Property").(*components.Property)
 
+	log.Printf("Player funds: %f, Property price: %f\n", player.Funds, property.Price)
 	if player.Funds >= property.Price {
 		player.Funds -= property.Price
 		property.Owned = true
@@ -162,8 +164,8 @@ func handleUpgradeProperty(world *ecs.World, data UpgradePropertyPayload, w http
 	}
 
 	// Get the Property
-	property, propertyExists := propertyEntity.GetComponent("Property").(*components.Property)
-	if !propertyExists || property == nil {
+	property, ok := propertyEntity.GetComponent("Property").(*components.Property)
+	if !ok || property == nil {
 		utils.SendResponse(w, http.StatusBadRequest, "Property missing or invalid", nil, http.StatusInternalServerError)
 		return
 	}
@@ -196,7 +198,7 @@ func handleUpgradeProperty(world *ecs.World, data UpgradePropertyPayload, w http
 
 	// Get the Player
 	player, playerExists := ownerEntity.GetComponent("Player").(*components.Player)
-	if !playerExists || player == nil {
+	if !playerExists {
 		utils.SendResponse(w, http.StatusBadRequest, "Player missing or invalid", nil, http.StatusInternalServerError)
 		return
 	}

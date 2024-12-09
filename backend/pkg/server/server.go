@@ -1,5 +1,3 @@
-// pkg/server/server.go
-
 package server
 
 import (
@@ -29,15 +27,14 @@ func StartServer(world *ecs.World) *http.Server {
 		defer mu.Unlock()
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(world) // Include game state
+		json.NewEncoder(w).Encode(world)
 	})
 
-	// Configure CORS
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:5173"}, // Allow your frontend's origin
+		AllowedOrigins:   []string{"http://localhost:5173"},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type"},
-		AllowCredentials: true, // If you need to allow cookies or authentication
+		AllowCredentials: true,
 	})
 
 	handler := c.Handler(mux)
@@ -47,7 +44,6 @@ func StartServer(world *ecs.World) *http.Server {
 		Handler: handler,
 	}
 
-	// Start the server in a goroutine
 	go func() {
 		log.Println("Server started at http://localhost:8080")
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {

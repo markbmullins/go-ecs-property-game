@@ -5,12 +5,11 @@ import (
 	"github.com/markbmullins/city-developer/pkg/ecs"
 )
 
-func GetNeighorhoodEntities(world *ecs.World) []*components.Neighborhood {
+func GetNeighborhoodEntities(world *ecs.World) []*components.Neighborhood {
 	neighborhoodEntities := make([]*components.Neighborhood, 0)
 	for _, entity := range world.Entities {
-		neighborhoodComp := entity.GetComponent("Neighborhood")
-		if neighborhoodComp != nil {
-			neighborhoodEntities = append(neighborhoodEntities, neighborhoodComp.(*components.Neighborhood))
+		if neighborhoodComp, ok := entity.GetComponent("Neighborhood").(*components.Neighborhood); ok {
+			neighborhoodEntities = append(neighborhoodEntities, neighborhoodComp)
 		}
 	}
 	return neighborhoodEntities
