@@ -1,7 +1,7 @@
 // src/components/GameState.tsx
 
 import React from "react";
-import { World, Entity, PlayerComponent, GameTimeComponent } from "../types";
+import { World, Entity, Player, GameTime } from "../types";
 
 interface GameStateProps {
   gameState: World;
@@ -21,13 +21,10 @@ const GameState: React.FC<GameStateProps> = ({ gameState }) => {
     return <p>Player or Game Time information is missing.</p>;
   }
 
-  const playerComponent = playerEntity.Components
-    .PlayerComponent as PlayerComponent;
-  const gameTimeComponent = (
-    gameTimeEntity.Components.GameTime as GameTimeComponent
-  ).Time;
+  const playerComponent = playerEntity.Components.Player as Player;
+  const gameTimeComponent = gameTimeEntity.Components.GameTime as GameTime;
 
-  const playerFunds = playerComponent.Player.Funds.toFixed(2);
+  const playerFunds = playerComponent.Funds.toFixed(2);
   const currentDate = new Date(
     gameTimeComponent.CurrentDate
   ).toLocaleDateString();

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { performAction } from "../api";
-import { World, Entity, PropertyComponent } from "../types";
+import { World, Property } from "../types";
 
 interface PropertyListProps {
   gameState: World;
@@ -15,7 +15,7 @@ const PropertyList: React.FC<PropertyListProps> = ({
 }) => {
   const entities = Object.values(gameState.Entities);
   const properties = entities.filter(
-    (entity) => "PropertyComponent" in entity.Components
+    (entity) => "Property" in entity.Components
   );
 
   const playerID = 1; // Assuming the player's entity ID is 1
@@ -71,27 +71,25 @@ const PropertyList: React.FC<PropertyListProps> = ({
   return (
     <div className="property-list">
       <h2>Properties</h2>
-      {properties.map((property) => {
-        const propertyComponent = property.Components
-          .PropertyComponent as PropertyComponent;
-        const { Property } = propertyComponent;
-        const owned = Property.Owned;
+      {properties.map((propertyEntity) => {
+        const property = propertyEntity.Components.Property as Property;
+        const owned = property.Owned;
         const propertyID = property.ID;
 
         return (
           <div key={propertyID} className="property-card">
-            <h3>{Property.Name}</h3>
+            <h3>{property.Name}</h3>
             <p>
-              <strong>Type:</strong> {Property.Type}
+              <strong>Type:</strong> {property.Type}
             </p>
             <p>
-              <strong>Subtype:</strong> {Property.Subtype}
+              <strong>Subtype:</strong> {property.Subtype}
             </p>
             <p>
-              <strong>Price:</strong> ${Property.Price}
+              <strong>Price:</strong> ${property.Price}
             </p>
             <p>
-              <strong>Base Rent:</strong> ${Property.BaseRent}
+              <strong>Base Rent:</strong> ${property.BaseRent}
             </p>
             <p>
               <strong>Owned:</strong> {owned ? "Yes" : "No"}
@@ -103,7 +101,7 @@ const PropertyList: React.FC<PropertyListProps> = ({
                 </button>
                 <div className="upgrade-paths">
                   <h4>Upgrade Paths</h4>
-                  {Object.keys(Property.UpgradePaths).map((pathName) => (
+                  {Object.keys(property.UpgradePaths).map((pathName) => (
                     <button
                       key={pathName}
                       onClick={() =>
