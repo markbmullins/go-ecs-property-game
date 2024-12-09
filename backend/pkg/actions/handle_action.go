@@ -37,13 +37,13 @@ type ActionRequest struct {
 
 func HandleAction(world *ecs.World, w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		utils.SendResponse(w, "error", "Invalid request method", nil, http.StatusMethodNotAllowed)
+		utils.SendResponse(w, http.StatusBadRequest, "Invalid request method", nil, http.StatusMethodNotAllowed)
 		return
 	}
 
 	var actionReq ActionRequest
 	if err := json.NewDecoder(r.Body).Decode(&actionReq); err != nil {
-		utils.SendResponse(w, "error", "Invalid request payload", nil, http.StatusBadRequest)
+		utils.SendResponse(w, http.StatusBadRequest, "Invalid request payload", nil, http.StatusBadRequest)
 		return
 	}
 
@@ -73,20 +73,20 @@ func HandleAction(world *ecs.World, w http.ResponseWriter, r *http.Request) {
 		}
 		handleControlTime(world, payload, w)
 	default:
-		utils.SendResponse(w, "error", "Unknown action", nil, http.StatusBadRequest)
+		utils.SendResponse(w, http.StatusBadRequest, "Unknown action", nil, http.StatusBadRequest)
 	}
 }
 
 func handleControlTime(world *ecs.World, payload interface{}, w http.ResponseWriter) {
 	data, ok := payload.(map[string]interface{})
 	if !ok {
-		utils.SendResponse(w, "error", "Invalid payload structure", nil, http.StatusBadRequest)
+		utils.SendResponse(w, http.StatusBadRequest, "Invalid payload structure", nil, http.StatusBadRequest)
 		return
 	}
 
 	action, ok := data["action"].(string)
 	if !ok {
-		utils.SendResponse(w, "error", "Missing or invalid action", nil, http.StatusBadRequest)
+		utils.SendResponse(w, http.StatusBadRequest, "Missing or invalid action", nil, http.StatusBadRequest)
 		return
 	}
 
@@ -105,13 +105,13 @@ func handleControlTime(world *ecs.World, payload interface{}, w http.ResponseWri
 				gameTime.SpeedMultiplier = speedMultiplier
 			}
 		default:
-			utils.SendResponse(w, "error", "Invalid control action", nil, http.StatusBadRequest)
+			utils.SendResponse(w, http.StatusBadRequest, "Invalid control action", nil, http.StatusBadRequest)
 			return
 		}
-		utils.SendResponse(w, "success", "Time control action performed successfully", gameTime, http.StatusOK)
+		utils.SendResponse(w, http.StatusOK, "Time control action performed successfully", gameTime, http.StatusOK)
 		return
 	} else {
-		utils.SendResponse(w, "error", "Game time component not found", nil, http.StatusNotFound)
+		utils.SendResponse(w, http.StatusBadRequest, "Game time component not found", nil, http.StatusNotFound)
 
 	}
 
@@ -130,7 +130,7 @@ func handleBuyProperty(world *ecs.World, data BuyPropertyPayload, w http.Respons
 	gameTime := world.GetGameTime().GetComponent("GameTime").(*components.GameTime)
 
 	if !playerFound || !propertyFound {
-		utils.SendResponse(w, "error", "Player or Property not found", nil, http.StatusNotFound)
+		utils.SendResponse(w, http.StatusBadRequest, "Player or Property not found", nil, http.StatusNotFound)
 		return
 	}
 
@@ -143,9 +143,9 @@ func handleBuyProperty(world *ecs.World, data BuyPropertyPayload, w http.Respons
 		property.PlayerID = playerID
 		property.PurchaseDate = gameTime.CurrentDate
 
-		utils.SendResponse(w, "success", "Property purchased successfully", world, http.StatusOK)
+		utils.SendResponse(w, http.StatusOK, "Property purchased successfully", world, http.StatusOK)
 	} else {
-		utils.SendResponse(w, "error", "Insufficient funds", nil, http.StatusForbidden)
+		utils.SendResponse(w, http.StatusBadRequest, "Insufficient funds", nil, http.StatusForbidden)
 	}
 }
 
@@ -157,21 +157,21 @@ func handleUpgradeProperty(world *ecs.World, data UpgradePropertyPayload, w http
 	propertyEntity := world.GetProperty(propertyID)
 	propertyFound := propertyEntity != nil
 	if !propertyFound {
-		utils.SendResponse(w, "error", "Property not found", nil, http.StatusNotFound)
+		utils.SendResponse(w, http.StatusBadRequest, "Property not found", nil, http.StatusNotFound)
 		return
 	}
 
 	// Get the Property
 	property, propertyExists := propertyEntity.GetComponent("Property").(*components.Property)
 	if !propertyExists || property == nil {
-		utils.SendResponse(w, "error", "Property missing or invalid", nil, http.StatusInternalServerError)
+		utils.SendResponse(w, http.StatusBadRequest, "Property missing or invalid", nil, http.StatusInternalServerError)
 		return
 	}
 
 	// Validate the upgrade path
 	upgradePath, pathValid := property.UpgradePaths[pathName]
 	if !pathValid {
-		utils.SendResponse(w, "error", "Invalid upgrade path", nil, http.StatusBadRequest)
+		utils.SendResponse(w, http.StatusBadRequest, "Invalid upgrade path", nil, http.StatusBadRequest)
 		return
 	}
 
@@ -179,7 +179,7 @@ func handleUpgradeProperty(world *ecs.World, data UpgradePropertyPayload, w http
 
 	// Check if the current level is below the maximum for the upgrade path
 	if currentLevel >= len(upgradePath)-1 {
-		utils.SendResponse(w, "error", "Max upgrade level reached in this path", nil, http.StatusForbidden)
+		utils.SendResponse(w, http.StatusBadRequest, "Max upgrade level reached in this path", nil, http.StatusForbidden)
 		return
 	}
 
@@ -190,20 +190,20 @@ func handleUpgradeProperty(world *ecs.World, data UpgradePropertyPayload, w http
 	ownerEntity := world.GetPlayer(property.PlayerID)
 	ownerFound := ownerEntity != nil
 	if !ownerFound {
-		utils.SendResponse(w, "error", "Owner not found", nil, http.StatusNotFound)
+		utils.SendResponse(w, http.StatusBadRequest, "Owner not found", nil, http.StatusNotFound)
 		return
 	}
 
 	// Get the Player
 	player, playerExists := ownerEntity.GetComponent("Player").(*components.Player)
 	if !playerExists || player == nil {
-		utils.SendResponse(w, "error", "Player missing or invalid", nil, http.StatusInternalServerError)
+		utils.SendResponse(w, http.StatusBadRequest, "Player missing or invalid", nil, http.StatusInternalServerError)
 		return
 	}
 
 	// Check if the owner has sufficient funds
 	if player.Funds < nextUpgrade.Cost {
-		utils.SendResponse(w, "error", "Insufficient funds for upgrade", nil, http.StatusForbidden)
+		utils.SendResponse(w, http.StatusBadRequest, "Insufficient funds for upgrade", nil, http.StatusForbidden)
 		return
 	}
 
@@ -213,7 +213,7 @@ func handleUpgradeProperty(world *ecs.World, data UpgradePropertyPayload, w http
 	// Get current game time
 	gameTime, err := utils.GetCurrentGameTime(world)
 	if err != nil {
-		utils.SendResponse(w, "error", "Failed to retrieve game time", nil, http.StatusInternalServerError)
+		utils.SendResponse(w, http.StatusBadRequest, "Failed to retrieve game time", nil, http.StatusInternalServerError)
 		return
 	}
 
@@ -247,7 +247,7 @@ func handleUpgradeProperty(world *ecs.World, data UpgradePropertyPayload, w http
 		"rent_increase":    nextUpgrade.RentIncrease,
 		"days_to_complete": nextUpgrade.DaysToComplete,
 	}
-	utils.SendResponse(w, "success", "Property upgraded successfully", responseData, http.StatusOK)
+	utils.SendResponse(w, http.StatusOK, "Property upgraded successfully", responseData, http.StatusOK)
 }
 
 func getPrerequisiteUpgrade(property *components.Property, currentLevel int) *components.Upgrade {
@@ -267,7 +267,7 @@ func handleSellProperty(world *ecs.World, data SellPropertyPayload, w http.Respo
 
 	propertyFound := propertyEntity != nil
 	if !propertyFound {
-		utils.SendResponse(w, "error", "Property not found", nil, http.StatusNotFound)
+		utils.SendResponse(w, http.StatusBadRequest, "Property not found", nil, http.StatusNotFound)
 		return
 	}
 
@@ -282,9 +282,9 @@ func handleSellProperty(world *ecs.World, data SellPropertyPayload, w http.Respo
 		property.Owned = false
 		property.PlayerID = 0
 
-		utils.SendResponse(w, "success", "Property sold successfully", world, http.StatusOK)
+		utils.SendResponse(w, http.StatusOK, "Property sold successfully", world, http.StatusOK)
 	} else {
-		utils.SendResponse(w, "error", "Property is not owned or owner not found", nil, http.StatusForbidden)
+		utils.SendResponse(w, http.StatusBadRequest, "Property is not owned or owner not found", nil, http.StatusForbidden)
 	}
 }
 
@@ -292,13 +292,13 @@ func decodePayload(input interface{}, target interface{}, w http.ResponseWriter)
 	// Convert the interface{} to JSON bytes
 	jsonData, err := json.Marshal(input)
 	if err != nil {
-		utils.SendResponse(w, "error", "Failed to process payload", nil, http.StatusBadRequest)
+		utils.SendResponse(w, http.StatusBadRequest, "Failed to process payload", nil, http.StatusBadRequest)
 		return false
 	}
 
 	// Decode the JSON bytes into the target struct
 	if err := json.NewDecoder(bytes.NewReader(jsonData)).Decode(target); err != nil {
-		utils.SendResponse(w, "error", fmt.Sprintf("Invalid payload structure: %v", err), nil, http.StatusBadRequest)
+		utils.SendResponse(w, http.StatusBadRequest, fmt.Sprintf("Invalid payload structure: %v", err), nil, http.StatusBadRequest)
 		return false
 	}
 	return true
