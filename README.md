@@ -254,7 +254,6 @@ The `/state` endpoint retrieves the current state of the game, including entitie
                         "OccupancyRate": 0,
                         "TenantSatisfaction": 0,
                         "PurchaseDate": "0001-01-01T00:00:00Z",
-                        "ProrateRent": false,
                         "NeighborhoodID": 1,
                         "UgradedNeighborhoodRentBoost": 0
                     }
@@ -380,7 +379,6 @@ The `/state` endpoint retrieves the current state of the game, including entitie
                         "OccupancyRate": 0,
                         "TenantSatisfaction": 0,
                         "PurchaseDate": "0001-01-01T00:00:00Z",
-                        "ProrateRent": false,
                         "NeighborhoodID": 1,
                         "UgradedNeighborhoodRentBoost": 0
                     }

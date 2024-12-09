@@ -101,7 +101,6 @@ func createTestWorld(purchaseDate time.Time, baseRent float64) *ecs.World {
 		BaseRent:     baseRent,
 		PlayerID:     1,
 		PurchaseDate: purchaseDate,
-		ProrateRent:  true,
 	}
 	propertyEntity := ecs.NewProperty(2)
 	propertyEntity.AddComponent("Property", property)
@@ -172,7 +171,6 @@ func createTestWorldWithUpgrades(purchaseDate time.Time, baseRent float64) *ecs.
 		BaseRent:     baseRent,
 		PlayerID:     1,
 		PurchaseDate: purchaseDate,
-		ProrateRent:  true,
 		Upgrades:     []components.Upgrade{},
 		UpgradePaths: map[string][]components.Upgrade{
 			"Luxury": {renovatedInterior, smartHomeAutomation, premiumFixtures},
@@ -242,7 +240,6 @@ func createTestWorldWithCircularUpgrades(purchaseDate time.Time, baseRent float6
 		BaseRent:     baseRent,
 		PlayerID:     1,
 		PurchaseDate: purchaseDate,
-		ProrateRent:  true,
 		Upgrades:     []components.Upgrade{},
 		UpgradePaths: map[string][]components.Upgrade{
 			"CircularPath": {upgradeA, upgradeB},
@@ -319,7 +316,6 @@ func createTestWorldWithUpgradeChain(purchaseDate time.Time, baseRent float64) *
 		BaseRent:     baseRent,
 		PlayerID:     1,
 		PurchaseDate: purchaseDate,
-		ProrateRent:  true,
 		Upgrades:     []components.Upgrade{},
 		UpgradePaths: map[string][]components.Upgrade{
 			"ChainPath": {upgradedInterior, upgrade2, upgrade3},
@@ -427,7 +423,6 @@ func createTestWorldWithUpgradeTree(purchaseDate time.Time, baseRent float64) *e
 		BaseRent:     baseRent,
 		PlayerID:     1,
 		PurchaseDate: purchaseDate,
-		ProrateRent:  true,
 		Upgrades:     []components.Upgrade{},
 		UpgradePaths: map[string][]components.Upgrade{
 			"Luxury":     {renovatedInterior, smartHomeAutomation, premiumFixtures},
@@ -690,7 +685,6 @@ func TestMultiplePropertiesWithDifferentPlayers(t *testing.T) {
 		BaseRent:     1000.0,
 		PlayerID:     player1.ID,
 		PurchaseDate: time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-		ProrateRent:  true,
 	}
 	propertyEntity1 := ecs.NewProperty(2)
 	propertyEntity1.AddComponent("Property", property1)
@@ -708,7 +702,6 @@ func TestMultiplePropertiesWithDifferentPlayers(t *testing.T) {
 		BaseRent:     2000.0,
 		PlayerID:     3, // Player ID corresponds to Player.ID
 		PurchaseDate: time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-		ProrateRent:  true,
 	}
 	propertyEntity2 := ecs.NewProperty(4)
 	propertyEntity2.AddComponent("Property", property2)
@@ -754,7 +747,6 @@ func TestRentWithPropertyUpgrade(t *testing.T) {
 	propertyComp.Upgrades = []components.Upgrade{
 		{RentIncrease: 200.0}, // Level 1
 	}
-	propertyComp.ProrateRent = false // Ensure full rent is collected
 
 	// Set CurrentDate to January 31, 2023
 	gameTime, err := utils.GetCurrentGameTime(world)

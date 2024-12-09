@@ -60,7 +60,6 @@ type Property struct {
 	OccupancyRate                float64
 	TenantSatisfaction           int
 	PurchaseDate                 time.Time
-	ProrateRent                  bool
 	NeighborhoodID               int
 	Description                  string
 	Address                      string

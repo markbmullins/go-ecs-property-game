@@ -48,7 +48,6 @@ var WillowResidential = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  true,
 		NeighborhoodID:               5,
 	},
 	{
@@ -68,7 +67,6 @@ var WillowResidential = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  true,
 		NeighborhoodID:               5,
 	},
 	{
@@ -88,7 +86,6 @@ var WillowResidential = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  true,
 		NeighborhoodID:               5,
 	},
 	{
@@ -108,7 +105,6 @@ var WillowResidential = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  true,
 		NeighborhoodID:               5,
 	},
 	{
@@ -128,7 +124,6 @@ var WillowResidential = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  true,
 		NeighborhoodID:               5,
 	},
 	{
@@ -148,7 +143,6 @@ var WillowResidential = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  true,
 		NeighborhoodID:               5,
 	},
 	{
@@ -168,7 +162,6 @@ var WillowResidential = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  true,
 		NeighborhoodID:               5,
 	},
 	{
@@ -188,7 +181,6 @@ var WillowResidential = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  true,
 		NeighborhoodID:               5,
 	},
 	{
@@ -208,7 +200,6 @@ var WillowResidential = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  true,
 		NeighborhoodID:               5,
 	},
 	{
@@ -228,7 +219,6 @@ var WillowResidential = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  true,
 		NeighborhoodID:               5,
 	},
 }
@@ -251,7 +241,6 @@ var WillowCommercial = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  false,
 		NeighborhoodID:               5,
 	},
 	{
@@ -271,7 +260,6 @@ var WillowCommercial = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  false,
 		NeighborhoodID:               5,
 	},
 	{
@@ -291,7 +279,6 @@ var WillowCommercial = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  false,
 		NeighborhoodID:               5,
 	},
 	{
@@ -311,7 +298,6 @@ var WillowCommercial = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  false,
 		NeighborhoodID:               5,
 	},
 	{
@@ -331,7 +317,6 @@ var WillowCommercial = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  false,
 		NeighborhoodID:               5,
 	},
 	{
@@ -351,7 +336,6 @@ var WillowCommercial = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  false,
 		NeighborhoodID:               5,
 	},
 	{
@@ -371,7 +355,6 @@ var WillowCommercial = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  false,
 		NeighborhoodID:               5,
 	},
 	{
@@ -391,7 +374,6 @@ var WillowCommercial = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  false,
 		NeighborhoodID:               5,
 	},
 	{
@@ -411,7 +393,6 @@ var WillowCommercial = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  false,
 		NeighborhoodID:               5,
 	},
 	{
@@ -431,7 +412,6 @@ var WillowCommercial = []components.Property{
 		OccupancyRate:                0.0,
 		TenantSatisfaction:           0,
 		PurchaseDate:                 time.Time{},
-		ProrateRent:                  false,
 		NeighborhoodID:               5,
 	},
 }

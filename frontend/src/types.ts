@@ -48,7 +48,6 @@ export interface Property {
   OccupancyRate: number;
   TenantSatisfaction: number;
   PurchaseDate: string; // ISO string
-  ProrateRent: boolean;
   NeighborhoodID: number;
   UgradedNeighborhoodRentBoost: number;
 }

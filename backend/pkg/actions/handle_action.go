@@ -1,7 +1,9 @@
 package actions
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/markbmullins/city-developer/pkg/components"
@@ -9,13 +11,30 @@ import (
 	"github.com/markbmullins/city-developer/pkg/utils"
 )
 
-// ActionRequest defines the structure of an incoming action request.
+type ControlTimePayload struct {
+	Action          string  `json:"action"`
+	SpeedMultiplier float64 `json:"speed_multiplier,omitempty"`
+}
+
+type BuyPropertyPayload struct {
+	PropertyID int `json:"property_id"`
+	PlayerID   int `json:"player_id"`
+}
+
+type UpgradePropertyPayload struct {
+	PropertyID int    `json:"property_id"`
+	PathName   string `json:"path_name"`
+}
+
+type SellPropertyPayload struct {
+	PropertyID int `json:"property_id"`
+}
+
 type ActionRequest struct {
 	Action  string      `json:"action"`
 	Payload interface{} `json:"payload"`
 }
 
-// HandleAction processes an incoming action request.
 func HandleAction(world *ecs.World, w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		utils.SendResponse(w, "error", "Invalid request method", nil, http.StatusMethodNotAllowed)
@@ -30,19 +49,34 @@ func HandleAction(world *ecs.World, w http.ResponseWriter, r *http.Request) {
 
 	switch actionReq.Action {
 	case "buy_property":
-		handleBuyProperty(world, actionReq.Payload, w)
+		var payload BuyPropertyPayload
+		if !decodePayload(actionReq.Payload, &payload, w) {
+			return
+		}
+		handleBuyProperty(world, payload, w)
 	case "upgrade_property":
-		handleUpgradeProperty(world, actionReq.Payload, w)
+		var payload UpgradePropertyPayload
+		if !decodePayload(actionReq.Payload, &payload, w) {
+			return
+		}
+		handleUpgradeProperty(world, payload, w)
 	case "sell_property":
-		handleSellProperty(world, actionReq.Payload, w)
+		var payload SellPropertyPayload
+		if !decodePayload(actionReq.Payload, &payload, w) {
+			return
+		}
+		handleSellProperty(world, payload, w)
 	case "control_time":
-		handleControlTime(world, actionReq.Payload, w)
+		var payload ControlTimePayload
+		if !decodePayload(actionReq.Payload, &payload, w) {
+			return
+		}
+		handleControlTime(world, payload, w)
 	default:
 		utils.SendResponse(w, "error", "Unknown action", nil, http.StatusBadRequest)
 	}
 }
 
-// handleControlTime handles the "control_time" action.
 func handleControlTime(world *ecs.World, payload interface{}, w http.ResponseWriter) {
 	data, ok := payload.(map[string]interface{})
 	if !ok {
@@ -83,31 +117,20 @@ func handleControlTime(world *ecs.World, payload interface{}, w http.ResponseWri
 
 }
 
-// handleBuyProperty handles the "buy_property" action.
-func handleBuyProperty(world *ecs.World, payload interface{}, w http.ResponseWriter) {
-	data, ok := payload.(map[string]interface{})
-	if !ok {
-		utils.SendResponse(w, "error", "Invalid payload structure", nil, http.StatusBadRequest)
-		return
-	}
+func handleBuyProperty(world *ecs.World, data BuyPropertyPayload, w http.ResponseWriter) {
 
-	propertyID := int(data["property_id"].(float64))
-	playerID := int(data["player_id"].(float64))
+	propertyID := data.PropertyID
+	playerID := data.PlayerID
 
 	playerEntity := world.GetPlayer(playerID)
 	propertyEntity := world.GetProperty(propertyID)
 
 	playerFound := playerEntity != nil
 	propertyFound := propertyEntity != nil
-	gameTime, gameTimeFoundErr := utils.GetCurrentGameTime(world)
+	gameTime := world.GetGameTime().GetComponent("GameTime").(*components.GameTime)
 
 	if !playerFound || !propertyFound {
 		utils.SendResponse(w, "error", "Player or Property not found", nil, http.StatusNotFound)
-		return
-	}
-
-	if gameTimeFoundErr != nil {
-		utils.SendResponse(w, "error", "Unable to fetch game time", nil, http.StatusNotFound)
 		return
 	}
 
@@ -118,7 +141,6 @@ func handleBuyProperty(world *ecs.World, payload interface{}, w http.ResponseWri
 		player.Funds -= property.Price
 		property.Owned = true
 		property.PlayerID = playerID
-		property.ProrateRent = true
 		property.PurchaseDate = gameTime.CurrentDate
 
 		utils.SendResponse(w, "success", "Property purchased successfully", world, http.StatusOK)
@@ -127,27 +149,9 @@ func handleBuyProperty(world *ecs.World, payload interface{}, w http.ResponseWri
 	}
 }
 
-// handleUpgradeProperty handles the "upgrade_property" action.// handleUpgradeProperty handles the "upgrade_property" action.
-func handleUpgradeProperty(world *ecs.World, payload interface{}, w http.ResponseWriter) {
-	data, ok := payload.(map[string]interface{})
-	if !ok {
-		utils.SendResponse(w, "error", "Invalid payload structure", nil, http.StatusBadRequest)
-		return
-	}
-
-	// Extract property ID and upgrade path name from payload
-	propertyIDFloat, exists := data["property_id"]
-	if !exists {
-		utils.SendResponse(w, "error", "property_id is required", nil, http.StatusBadRequest)
-		return
-	}
-	propertyID := int(propertyIDFloat.(float64))
-
-	pathName, pathExists := data["path_name"].(string)
-	if !pathExists {
-		utils.SendResponse(w, "error", "path_name is required", nil, http.StatusBadRequest)
-		return
-	}
+func handleUpgradeProperty(world *ecs.World, data UpgradePropertyPayload, w http.ResponseWriter) {
+	propertyID := data.PropertyID
+	pathName := data.PathName
 
 	// Retrieve the property entity
 	propertyEntity := world.GetProperty(propertyID)
@@ -246,7 +250,6 @@ func handleUpgradeProperty(world *ecs.World, payload interface{}, w http.Respons
 	utils.SendResponse(w, "success", "Property upgraded successfully", responseData, http.StatusOK)
 }
 
-// getPrerequisiteUpgrade retrieves the prerequisite upgrade based on the current level.
 func getPrerequisiteUpgrade(property *components.Property, currentLevel int) *components.Upgrade {
 	if currentLevel == 0 {
 		return nil // No prerequisite for first upgrade
@@ -258,15 +261,8 @@ func getPrerequisiteUpgrade(property *components.Property, currentLevel int) *co
 	return &prereq
 }
 
-// handleSellProperty handles the "sell_property" action.
-func handleSellProperty(world *ecs.World, payload interface{}, w http.ResponseWriter) {
-	data, ok := payload.(map[string]interface{})
-	if !ok {
-		utils.SendResponse(w, "error", "Invalid payload structure", nil, http.StatusBadRequest)
-		return
-	}
-
-	propertyID := int(data["property_id"].(float64))
+func handleSellProperty(world *ecs.World, data SellPropertyPayload, w http.ResponseWriter) {
+	propertyID := data.PropertyID
 	propertyEntity := world.GetProperty(propertyID)
 
 	propertyFound := propertyEntity != nil
@@ -290,4 +286,20 @@ func handleSellProperty(world *ecs.World, payload interface{}, w http.ResponseWr
 	} else {
 		utils.SendResponse(w, "error", "Property is not owned or owner not found", nil, http.StatusForbidden)
 	}
+}
+
+func decodePayload(input interface{}, target interface{}, w http.ResponseWriter) bool {
+	// Convert the interface{} to JSON bytes
+	jsonData, err := json.Marshal(input)
+	if err != nil {
+		utils.SendResponse(w, "error", "Failed to process payload", nil, http.StatusBadRequest)
+		return false
+	}
+
+	// Decode the JSON bytes into the target struct
+	if err := json.NewDecoder(bytes.NewReader(jsonData)).Decode(target); err != nil {
+		utils.SendResponse(w, "error", fmt.Sprintf("Invalid payload structure: %v", err), nil, http.StatusBadRequest)
+		return false
+	}
+	return true
 }

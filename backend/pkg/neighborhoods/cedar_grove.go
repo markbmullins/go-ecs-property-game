@@ -48,7 +48,6 @@ var CedarResidential = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   true,
 		NeighborhoodID:                4,
 	},
 	{
@@ -68,7 +67,6 @@ var CedarResidential = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   true,
 		NeighborhoodID:                4,
 	},
 	{
@@ -88,7 +86,6 @@ var CedarResidential = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   true,
 		NeighborhoodID:                4,
 	},
 	{
@@ -108,7 +105,6 @@ var CedarResidential = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   true,
 		NeighborhoodID:                4,
 	},
 	{
@@ -128,7 +124,6 @@ var CedarResidential = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   true,
 		NeighborhoodID:                4,
 	},
 	{
@@ -148,7 +143,6 @@ var CedarResidential = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   true,
 		NeighborhoodID:                4,
 	},
 	{
@@ -168,7 +162,6 @@ var CedarResidential = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   true,
 		NeighborhoodID:                4,
 	},
 	{
@@ -188,7 +181,6 @@ var CedarResidential = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   true,
 		NeighborhoodID:                4,
 	},
 	{
@@ -208,7 +200,6 @@ var CedarResidential = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   true,
 		NeighborhoodID:                4,
 	},
 	{
@@ -228,7 +219,6 @@ var CedarResidential = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   true,
 		NeighborhoodID:                4,
 	},
 }
@@ -251,7 +241,6 @@ var CedarCommercial = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   false,
 		NeighborhoodID:                4,
 	},
 	{
@@ -271,7 +260,6 @@ var CedarCommercial = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   false,
 		NeighborhoodID:                4,
 	},
 	{
@@ -291,7 +279,6 @@ var CedarCommercial = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   false,
 		NeighborhoodID:                4,
 	},
 	{
@@ -311,7 +298,6 @@ var CedarCommercial = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   false,
 		NeighborhoodID:                4,
 	},
 	{
@@ -331,7 +317,6 @@ var CedarCommercial = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   false,
 		NeighborhoodID:                4,
 	},
 	{
@@ -351,7 +336,6 @@ var CedarCommercial = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   false,
 		NeighborhoodID:                4,
 	},
 	{
@@ -371,7 +355,6 @@ var CedarCommercial = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   false,
 		NeighborhoodID:                4,
 	},
 	{
@@ -391,7 +374,6 @@ var CedarCommercial = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   false,
 		NeighborhoodID:                4,
 	},
 	{
@@ -411,7 +393,6 @@ var CedarCommercial = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   false,
 		NeighborhoodID:                4,
 	},
 	{
@@ -431,7 +412,6 @@ var CedarCommercial = []components.Property{
 		OccupancyRate:                 0.0,
 		TenantSatisfaction:            0,
 		PurchaseDate:                  time.Time{},
-		ProrateRent:                   false,
 		NeighborhoodID:                4,
 	},
 }
