@@ -5,13 +5,12 @@ import (
 	"time"
 
 	"github.com/markbmullins/city-developer/pkg/ecs"
-	"github.com/markbmullins/city-developer/pkg/utils"
 )
 
 type TimeSystem struct{}
 
 func (s *TimeSystem) Update(world *ecs.World) {
-	gameTime, _ := utils.GetCurrentGameTime(world)
+	gameTime, _ := world.GetCurrentGameTime()
 
 	if !gameTime.IsPaused {
 		// Store the original date before advancing

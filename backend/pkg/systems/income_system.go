@@ -7,7 +7,6 @@ import (
 
 	"github.com/markbmullins/city-developer/pkg/components"
 	"github.com/markbmullins/city-developer/pkg/ecs"
-	"github.com/markbmullins/city-developer/pkg/utils"
 )
 
 /*
@@ -59,11 +58,7 @@ type IncomeSystem struct{}
 
 // Update triggers the rent collection process, handling fast-forwarding of time.
 func (s *IncomeSystem) Update(world *ecs.World) {
-	gameTime, err := utils.GetCurrentGameTime(world)
-	if err != nil {
-		fmt.Println("Error: GameTime component not found")
-		return
-	}
+	gameTime, _ := world.GetCurrentGameTime()
 
 	if !gameTime.IsPaused {
 		monthsPassed := calculateMonthsPassed(gameTime.LastUpdated, gameTime.CurrentDate)
@@ -93,31 +88,14 @@ func processRent(world *ecs.World, lastUpdated time.Time, monthsPassed int) {
 }
 
 func processMonth(world *ecs.World, startDate, endDate time.Time) {
-	playerEntities := utils.GetPlayers(world)
-
-	for _, playerEntity := range playerEntities {
-		playerComponent := playerEntity.GetComponent("Player")
-		if playerComponent == nil {
-			continue
-		}
-
-		player := playerComponent.(*components.Player)
-		if len(player.Properties) == 0 {
-			// Skip players without properties
-			continue
-		}
-
-		for _, playerProperty := range player.Properties {
-			propertyEntity := world.GetProperty(playerProperty.ID)
-			if propertyEntity == nil {
-				continue
-			}
-
-			property := propertyEntity.GetComponent("Property").(*components.Property)
-			if property != nil && property.Owned {
-				rent := calculateMonthlyRent(property, startDate, endDate)
+	for ownerID := range world.OwnedPropertiesIndex {
+		var ownedProperties = world.GetOwnedEntities(ownerID)
+		for _, ownedPropertyEntity := range ownedProperties {
+			ownable, _ := ecs.GetComponent[components.Ownable](ownedPropertyEntity)
+			if ownable.Owned && ownable.OwnerID == ownerID {
+				rent := calculateMonthlyRent(ownedPropertyEntity, startDate, endDate, world)
 				if rent > 0 {
-					distributeRentToOwner(world, property, rent)
+					distributeRentToOwner(world, ownedPropertyEntity, rent)
 				}
 			}
 		}
@@ -130,7 +108,7 @@ func processMonth(world *ecs.World, startDate, endDate time.Time) {
 // - Each upgrade also begins contributing rent the day after it completes, if within the month.
 // - Both base rent and upgrades are prorated based on the number of days active in the month.
 // - After determining total active days for the property and any upgrades, it rounds the total rent down to the nearest multiple of 5.
-func calculateMonthlyRent(property *components.Property, monthStart, monthEnd time.Time) float64 {
+func calculateMonthlyRent(property *ecs.Entity, monthStart, monthEnd time.Time, world *ecs.World) float64 {
 	daysInCurrentMonth := float64(daysInMonth(monthStart))
 	if daysInCurrentMonth == 0 {
 		// Safety check: Should never happen since daysInMonth should always return > 0
@@ -139,7 +117,8 @@ func calculateMonthlyRent(property *components.Property, monthStart, monthEnd ti
 
 	// Determine when the property first becomes eligible to collect rent this month.
 	// Rent starts the day after the purchase date, if that day falls within this month.
-	propertyRentStartDate := maxTime(property.PurchaseDate.AddDate(0, 0, 1), monthStart)
+	var purchaseableComponent, _ = ecs.GetComponent[components.Purchaseable](property)
+	propertyRentStartDate := maxTime(purchaseableComponent.PurchaseDate.AddDate(0, 0, 1), monthStart)
 	if propertyRentStartDate.After(monthEnd) {
 		// The property wasn't active this month at all (e.g., purchased too late in the month).
 		return 0
@@ -148,15 +127,22 @@ func calculateMonthlyRent(property *components.Property, monthStart, monthEnd ti
 	// Calculate the number of days the property is active in this month.
 	propertyRentDays := countDaysInRange(propertyRentStartDate, monthEnd)
 
-	// Calculate daily base rent by dividing the base rent by the total days in the month.
-	baseDailyRent := (property.BaseRent + property.RentBoost) / daysInCurrentMonth
-
+	var rentableComponent, _ = ecs.GetComponent[components.Rentable](property)
+	var rentBoostableComponent, _ = ecs.GetComponent[components.RentBoostable](property)
+	var rentBoostApplies = doesRentBoostApply(property, world)
+	monthlyRent := rentableComponent.BaseRent
+	if rentBoostApplies {
+		monthlyRent += (rentBoostableComponent.BoostPercentage / 100) * monthlyRent
+	}
+	baseDailyRent := monthlyRent / daysInCurrentMonth
 	totalBaseRent := (baseDailyRent * float64(propertyRentDays))
 
+	var upgradeableComponent, _ = ecs.GetComponent[components.Upgradable](property)
+	var appliedUpgrades = upgradeableComponent.AppliedUpgrades
 	// Calculate the total rent from all upgrades active during this month.
 	// Each upgrade also begins contributing rent the day after its completion date.
 	totalUpgradeRent := 0.0
-	for _, upgrade := range property.Upgrades {
+	for _, upgrade := range appliedUpgrades {
 		upgradeCompletionDate := upgrade.PurchaseDate.AddDate(0, 0, upgrade.DaysToComplete)
 		upgradeRentStart := upgradeCompletionDate.AddDate(0, 0, 1)
 
@@ -190,33 +176,28 @@ func calculateMonthlyRent(property *components.Property, monthStart, monthEnd ti
 	return roundToNearest5(totalRent)
 }
 
-func distributeRentToOwner(world *ecs.World, property *components.Property, rent float64) {
-	// Get all player entities from the world
-	playerEntities := utils.GetPlayers(world)
+func doesRentBoostApply(property *ecs.Entity, world *ecs.World) bool {
+	groupable, _ := ecs.GetComponent[components.Groupable](property)
+	rentBoostable, _ := ecs.GetComponent[components.RentBoostable](property)
 
-	for _, playerEntity := range playerEntities {
-		// Safely retrieve the Player component
-		playerComponent := playerEntity.GetComponent("Player")
-		if playerComponent == nil {
-			continue
-		}
+	groupID := groupable.GroupID
 
-		// Assert the component to *components.Player
-		player, ok := playerComponent.(*components.Player)
-		if !ok {
-			continue
-		}
-
-		// Check if this player owns the property
-		if player.ID == property.PlayerID {
-			player.Funds += rent
-			fmt.Printf("Rent of %.2f distributed to player ID %d\n", rent, player.ID)
-			return
-		}
+	upgradedPercentage, ok := world.GroupUpgradedPercentages[groupID]
+	if !ok {
+		// If not found, assume 0 or handle gracefully
+		return false
 	}
 
-	// Log a warning if no matching player is found
-	fmt.Printf("Warning: No player found owning property ID %d\n", property.ID)
+	return upgradedPercentage > rentBoostable.ThresholdPercentage
+}
+
+func distributeRentToOwner(world *ecs.World, property *ecs.Entity, rent float64) {
+	// Get all player entities from the world
+	ownable, _ := ecs.GetComponent[components.Ownable](property)
+	playerEntity := world.GetPlayer(ownable.OwnerID)
+	fundsComponent, _ := ecs.GetComponent[components.Funds](playerEntity)
+	fundsComponent.Amount += rent
+	fmt.Printf("Rent of %.2f distributed to player ID %s\n", rent, playerEntity.Key.ToString())
 }
 
 func calculateMonthsPassed(lastUpdated, currentDate time.Time) int {

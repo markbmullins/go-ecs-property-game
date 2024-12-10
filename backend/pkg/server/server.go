@@ -23,6 +23,7 @@ func StartServer(world *ecs.World) *http.Server {
 	})
 
 	mux.HandleFunc("/state", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Received GET request for /state")
 		mu.Lock()
 		defer mu.Unlock()
 
