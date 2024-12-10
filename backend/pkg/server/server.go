@@ -13,6 +13,27 @@ import (
 
 var mu sync.Mutex
 
+type PartialWorld struct {
+	Entities                 map[string]*ecs.Entity `json:"entities"`
+	OwnedPropertiesIndex     map[int][]int          `json:"owned_properties_index"`     // ownerID -> propertyIDs
+	GroupPropertiesIndex     map[int][]int          `json:"group_properties_index"`     // groupID -> propertyIDs
+	GroupUpgradedPercentages map[int]float64        `json:"group_upgraded_percentages"` // groupID -> upgradedPercentage
+	GroupUpgradedCounts      map[int]int            `json:"group_upgraded_counts"`      // groupID -> number of properties with >=1 upgrade
+	Players                  []*ecs.Entity          `json:"players"`
+}
+
+func sendPartialWorld(w http.ResponseWriter, world *ecs.World) {
+	partial := PartialWorld{
+		Entities:                 world.Entities,
+		OwnedPropertiesIndex:     world.OwnedPropertiesIndex,
+		GroupPropertiesIndex:     world.GroupPropertiesIndex,
+		GroupUpgradedPercentages: world.GroupUpgradedPercentages,
+		GroupUpgradedCounts:      world.GroupUpgradedCounts,
+		Players:                  world.Players,
+	}
+	json.NewEncoder(w).Encode(partial)
+}
+
 func StartServer(world *ecs.World) *http.Server {
 	mux := http.NewServeMux()
 
@@ -28,7 +49,7 @@ func StartServer(world *ecs.World) *http.Server {
 		defer mu.Unlock()
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(world)
+		sendPartialWorld(w, world)
 	})
 
 	c := cors.New(cors.Options{
