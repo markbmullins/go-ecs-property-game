@@ -78,337 +78,506 @@ The `/state` endpoint retrieves the current state of the game, including entitie
 ```
 {
     "Entities": {
-        "0": {
-            "ID": 0,
-            "Components": {
-                "GameTime": {
-                    "Time": {
-                        "CurrentDate": "2023-01-04T00:00:00Z",
-                        "IsPaused": false,
-                        "SpeedMultiplier": 1,
-                        "NewMonth": false,
-                        "LastUpdated": "2023-01-03T00:00:00Z"
-                    }
-                }
-            }
+      "GameTime-0": {
+        "Key": {
+          "EntityType": "GameTime",
+          "ID": 0
         },
-        "1": {
-            "ID": 1,
-            "Components": {
-                "PlayerComponent": {
-                    "Player": {
-                        "ID": 1,
-                        "Funds": 10000,
-                        "Properties": null
-                    }
-                }
-            }
-        },
-        "2": {
-            "ID": 2,
-            "Components": {
-                "PropertyComponent": {
-                    "Property": {
-                        "Name": "Residential 1",
-                        "Type": "Residential",
-                        "Subtype": "SingleFamily",
-                        "BaseRent": 1000,
-                        "RentBoost": 0,
-                        "Owned": false,
-                        "UpgradeLevel": 0,
-                        "Upgrades": null,
-                        "UpgradePaths": {
-                            "Efficiency": [
-                                {
-                                    "Name": "Solar Panels",
-                                    "ID": "efficiency_1",
-                                    "Level": 0,
-                                    "Cost": 8000,
-                                    "RentIncrease": 300,
-                                    "DaysToComplete": 10,
-                                    "PurchaseDate": "0001-01-01T00:00:00Z",
-                                    "Prerequisite": null,
-                                    "Applied": false
-                                },
-                                {
-                                    "Name": "Energy-efficient Windows",
-                                    "ID": "efficiency_2",
-                                    "Level": 0,
-                                    "Cost": 12000,
-                                    "RentIncrease": 500,
-                                    "DaysToComplete": 15,
-                                    "PurchaseDate": "0001-01-01T00:00:00Z",
-                                    "Prerequisite": {
-                                        "Name": "Solar Panels",
-                                        "ID": "efficiency_1",
-                                        "Level": 0,
-                                        "Cost": 8000,
-                                        "RentIncrease": 300,
-                                        "DaysToComplete": 10,
-                                        "PurchaseDate": "0001-01-01T00:00:00Z",
-                                        "Prerequisite": null,
-                                        "Applied": false
-                                    },
-                                    "Applied": false
-                                },
-                                {
-                                    "Name": "High-efficiency HVAC",
-                                    "ID": "efficiency_3",
-                                    "Level": 0,
-                                    "Cost": 20000,
-                                    "RentIncrease": 800,
-                                    "DaysToComplete": 20,
-                                    "PurchaseDate": "0001-01-01T00:00:00Z",
-                                    "Prerequisite": {
-                                        "Name": "Energy-efficient Windows",
-                                        "ID": "efficiency_2",
-                                        "Level": 0,
-                                        "Cost": 12000,
-                                        "RentIncrease": 500,
-                                        "DaysToComplete": 15,
-                                        "PurchaseDate": "0001-01-01T00:00:00Z",
-                                        "Prerequisite": {
-                                            "Name": "Solar Panels",
-                                            "ID": "efficiency_1",
-                                            "Level": 0,
-                                            "Cost": 8000,
-                                            "RentIncrease": 300,
-                                            "DaysToComplete": 10,
-                                            "PurchaseDate": "0001-01-01T00:00:00Z",
-                                            "Prerequisite": null,
-                                            "Applied": false
-                                        },
-                                        "Applied": false
-                                    },
-                                    "Applied": false
-                                }
-                            ],
-                            "Luxury": [
-                                {
-                                    "Name": "Renovated Interior",
-                                    "ID": "luxury_1",
-                                    "Level": 0,
-                                    "Cost": 10000,
-                                    "RentIncrease": 500,
-                                    "DaysToComplete": 7,
-                                    "PurchaseDate": "0001-01-01T00:00:00Z",
-                                    "Prerequisite": null,
-                                    "Applied": false
-                                },
-                                {
-                                    "Name": "Smart Home Automation",
-                                    "ID": "luxury_2",
-                                    "Level": 0,
-                                    "Cost": 20000,
-                                    "RentIncrease": 1000,
-                                    "DaysToComplete": 14,
-                                    "PurchaseDate": "0001-01-01T00:00:00Z",
-                                    "Prerequisite": {
-                                        "Name": "Renovated Interior",
-                                        "ID": "luxury_1",
-                                        "Level": 0,
-                                        "Cost": 10000,
-                                        "RentIncrease": 500,
-                                        "DaysToComplete": 7,
-                                        "PurchaseDate": "0001-01-01T00:00:00Z",
-                                        "Prerequisite": null,
-                                        "Applied": false
-                                    },
-                                    "Applied": false
-                                },
-                                {
-                                    "Name": "Premium Fixtures",
-                                    "ID": "luxury_3",
-                                    "Level": 0,
-                                    "Cost": 30000,
-                                    "RentIncrease": 1500,
-                                    "DaysToComplete": 21,
-                                    "PurchaseDate": "0001-01-01T00:00:00Z",
-                                    "Prerequisite": {
-                                        "Name": "Smart Home Automation",
-                                        "ID": "luxury_2",
-                                        "Level": 0,
-                                        "Cost": 20000,
-                                        "RentIncrease": 1000,
-                                        "DaysToComplete": 14,
-                                        "PurchaseDate": "0001-01-01T00:00:00Z",
-                                        "Prerequisite": {
-                                            "Name": "Renovated Interior",
-                                            "ID": "luxury_1",
-                                            "Level": 0,
-                                            "Cost": 10000,
-                                            "RentIncrease": 500,
-                                            "DaysToComplete": 7,
-                                            "PurchaseDate": "0001-01-01T00:00:00Z",
-                                            "Prerequisite": null,
-                                            "Applied": false
-                                        },
-                                        "Applied": false
-                                    },
-                                    "Applied": false
-                                }
-                            ]
-                        },
-                        "Price": 10000,
-                        "PlayerID": 0,
-                        "OccupancyRate": 0,
-                        "TenantSatisfaction": 0,
-                        "PurchaseDate": "0001-01-01T00:00:00Z",
-                        "NeighborhoodID": 1,
-                        "UgradedNeighborhoodRentBoost": 0
-                    }
-                }
-            }
-        },
-        "3": {
-            "ID": 3,
-            "Components": {
-                "PropertyComponent": {
-                    "Property": {
-                        "Name": "Downtown Restaurant",
-                        "Type": "Commercial",
-                        "Subtype": "Restaurant",
-                        "BaseRent": 5000,
-                        "RentBoost": 0,
-                        "Owned": false,
-                        "UpgradeLevel": 0,
-                        "Upgrades": null,
-                        "UpgradePaths": {
-                            "Capacity": [
-                                {
-                                    "Name": "Expand Seating Area",
-                                    "ID": "capacity_1",
-                                    "Level": 0,
-                                    "Cost": 15000,
-                                    "RentIncrease": 700,
-                                    "DaysToComplete": 12,
-                                    "PurchaseDate": "0001-01-01T00:00:00Z",
-                                    "Prerequisite": null,
-                                    "Applied": false
-                                },
-                                {
-                                    "Name": "Add Outdoor Seating",
-                                    "ID": "capacity_2",
-                                    "Level": 0,
-                                    "Cost": 25000,
-                                    "RentIncrease": 1200,
-                                    "DaysToComplete": 18,
-                                    "PurchaseDate": "0001-01-01T00:00:00Z",
-                                    "Prerequisite": {
-                                        "Name": "Expand Seating Area",
-                                        "ID": "capacity_1",
-                                        "Level": 0,
-                                        "Cost": 15000,
-                                        "RentIncrease": 700,
-                                        "DaysToComplete": 12,
-                                        "PurchaseDate": "0001-01-01T00:00:00Z",
-                                        "Prerequisite": null,
-                                        "Applied": false
-                                    },
-                                    "Applied": false
-                                }
-                            ],
-                            "Technology": [
-                                {
-                                    "Name": "Install POS System",
-                                    "ID": "tech_1",
-                                    "Level": 0,
-                                    "Cost": 5000,
-                                    "RentIncrease": 200,
-                                    "DaysToComplete": 5,
-                                    "PurchaseDate": "0001-01-01T00:00:00Z",
-                                    "Prerequisite": null,
-                                    "Applied": false
-                                },
-                                {
-                                    "Name": "Automated Inventory Management",
-                                    "ID": "tech_2",
-                                    "Level": 0,
-                                    "Cost": 10000,
-                                    "RentIncrease": 400,
-                                    "DaysToComplete": 10,
-                                    "PurchaseDate": "0001-01-01T00:00:00Z",
-                                    "Prerequisite": {
-                                        "Name": "Install POS System",
-                                        "ID": "tech_1",
-                                        "Level": 0,
-                                        "Cost": 5000,
-                                        "RentIncrease": 200,
-                                        "DaysToComplete": 5,
-                                        "PurchaseDate": "0001-01-01T00:00:00Z",
-                                        "Prerequisite": null,
-                                        "Applied": false
-                                    },
-                                    "Applied": false
-                                },
-                                {
-                                    "Name": "Customer Loyalty App",
-                                    "ID": "tech_3",
-                                    "Level": 0,
-                                    "Cost": 15000,
-                                    "RentIncrease": 600,
-                                    "DaysToComplete": 14,
-                                    "PurchaseDate": "0001-01-01T00:00:00Z",
-                                    "Prerequisite": {
-                                        "Name": "Automated Inventory Management",
-                                        "ID": "tech_2",
-                                        "Level": 0,
-                                        "Cost": 10000,
-                                        "RentIncrease": 400,
-                                        "DaysToComplete": 10,
-                                        "PurchaseDate": "0001-01-01T00:00:00Z",
-                                        "Prerequisite": {
-                                            "Name": "Install POS System",
-                                            "ID": "tech_1",
-                                            "Level": 0,
-                                            "Cost": 5000,
-                                            "RentIncrease": 200,
-                                            "DaysToComplete": 5,
-                                            "PurchaseDate": "0001-01-01T00:00:00Z",
-                                            "Prerequisite": null,
-                                            "Applied": false
-                                        },
-                                        "Applied": false
-                                    },
-                                    "Applied": false
-                                }
-                            ]
-                        },
-                        "Price": 50000,
-                        "PlayerID": 0,
-                        "OccupancyRate": 0,
-                        "TenantSatisfaction": 0,
-                        "PurchaseDate": "0001-01-01T00:00:00Z",
-                        "NeighborhoodID": 1,
-                        "UgradedNeighborhoodRentBoost": 0
-                    }
-                }
-            }
+        "Components": {
+          "GameTime": {
+            "CurrentDate": "2023-01-04T00:00:00Z",
+            "IsPaused": false,
+            "SpeedMultiplier": 1,
+            "NewMonth": false,
+            "LastUpdated": "2023-01-03T00:00:00Z",
+            "RentCollectionDay": 1
+          }
         }
+      },
+      "Player-1": {
+        "Key": {
+          "EntityType": "Player",
+          "ID": 1
+        },
+        "Components": {
+          "Funds": {
+            "Amount": 100000000
+          },
+          "Nameable": {
+            "Name": "Mark"
+          }
+        }
+      },
+      "Property-61": {
+        "Key": {
+          "EntityType": "Property",
+          "ID": 61
+        },
+        "Components": {
+          "Addressable": {
+            "Address": "101 Maplewood Lane, Cedar Grove"
+          },
+          "Classifiable": {
+            "Type": "Residential",
+            "Subtype": "SingleFamily"
+          },
+          "Describable": {
+            "Description": "A cozy single-family home with a large backyard and modern amenities."
+          },
+          "Groupable": {
+            "GroupID": 4
+          },
+          "Nameable": {
+            "Name": "Maplewood Lane House"
+          },
+          "Ownable": {
+            "OwnerID": 0,
+            "Owned": false
+          },
+          "Purchaseable": {
+            "Cost": 300000,
+            "PurchaseDate": "0001-01-01T00:00:00Z"
+          },
+          "Rentable": {
+            "BaseRent": 1800,
+            "RentBoost": 0,
+            "LastRentCollectionDate": "0001-01-01T00:00:00Z"
+          },
+          "Upgradable": {
+            "PossibleUpgrades": {
+              "Cozy Enhancements": [
+                {
+                  "Name": "Insulation Upgrade",
+                  "Level": 1,
+                  "Cost": 3000,
+                  "RentIncrease": 150,
+                  "DaysToComplete": 5,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                },
+                {
+                  "Name": "Energy-efficient Appliances",
+                  "Level": 2,
+                  "Cost": 6000,
+                  "RentIncrease": 300,
+                  "DaysToComplete": 10,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                },
+                {
+                  "Name": "Smart Thermostat",
+                  "Level": 3,
+                  "Cost": 9000,
+                  "RentIncrease": 450,
+                  "DaysToComplete": 15,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                }
+              ],
+              "Exterior Enhancements": [
+                {
+                  "Name": "New Patio",
+                  "Level": 1,
+                  "Cost": 5000,
+                  "RentIncrease": 250,
+                  "DaysToComplete": 5,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                },
+                {
+                  "Name": "Fire Pit Installation",
+                  "Level": 2,
+                  "Cost": 10000,
+                  "RentIncrease": 500,
+                  "DaysToComplete": 10,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                },
+                {
+                  "Name": "Outdoor Kitchen",
+                  "Level": 3,
+                  "Cost": 15000,
+                  "RentIncrease": 750,
+                  "DaysToComplete": 15,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                }
+              ],
+              "Modern Upgrades": [
+                {
+                  "Name": "Open-plan Kitchen",
+                  "Level": 1,
+                  "Cost": 4000,
+                  "RentIncrease": 200,
+                  "DaysToComplete": 7,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                },
+                {
+                  "Name": "Smart Lighting",
+                  "Level": 2,
+                  "Cost": 8000,
+                  "RentIncrease": 400,
+                  "DaysToComplete": 14,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                },
+                {
+                  "Name": "Home Automation System",
+                  "Level": 3,
+                  "Cost": 12000,
+                  "RentIncrease": 600,
+                  "DaysToComplete": 21,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                }
+              ]
+            },
+            "AppliedUpgrades": []
+          }
+        }
+      },
+      "Property-62": {
+        "Key": {
+          "EntityType": "Property",
+          "ID": 62
+        },
+        "Components": {
+          "Addressable": {
+            "Address": "202 Sunnybrook Drive, Cedar Grove"
+          },
+          "Classifiable": {
+            "Type": "Residential",
+            "Subtype": "Townhome"
+          },
+          "Describable": {
+            "Description": "A charming townhome with modern finishes and a community garden."
+          },
+          "Groupable": {
+            "GroupID": 4
+          },
+          "Nameable": {
+            "Name": "Sunnybrook Townhome"
+          },
+          "Ownable": {
+            "OwnerID": 0,
+            "Owned": false
+          },
+          "Purchaseable": {
+            "Cost": 350000,
+            "PurchaseDate": "0001-01-01T00:00:00Z"
+          },
+          "Rentable": {
+            "BaseRent": 2200,
+            "RentBoost": 0,
+            "LastRentCollectionDate": "0001-01-01T00:00:00Z"
+          },
+          "Upgradable": {
+            "PossibleUpgrades": {
+              "Cozy Enhancements": [
+                {
+                  "Name": "Insulation Upgrade",
+                  "Level": 1,
+                  "Cost": 3000,
+                  "RentIncrease": 150,
+                  "DaysToComplete": 5,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                },
+                {
+                  "Name": "Energy-efficient Appliances",
+                  "Level": 2,
+                  "Cost": 6000,
+                  "RentIncrease": 300,
+                  "DaysToComplete": 10,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                },
+                {
+                  "Name": "Smart Thermostat",
+                  "Level": 3,
+                  "Cost": 9000,
+                  "RentIncrease": 450,
+                  "DaysToComplete": 15,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                }
+              ],
+              "Exterior Enhancements": [
+                {
+                  "Name": "New Patio",
+                  "Level": 1,
+                  "Cost": 5000,
+                  "RentIncrease": 250,
+                  "DaysToComplete": 5,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                },
+                {
+                  "Name": "Fire Pit Installation",
+                  "Level": 2,
+                  "Cost": 10000,
+                  "RentIncrease": 500,
+                  "DaysToComplete": 10,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                },
+                {
+                  "Name": "Outdoor Kitchen",
+                  "Level": 3,
+                  "Cost": 15000,
+                  "RentIncrease": 750,
+                  "DaysToComplete": 15,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                }
+              ],
+              "Modern Upgrades": [
+                {
+                  "Name": "Open-plan Kitchen",
+                  "Level": 1,
+                  "Cost": 4000,
+                  "RentIncrease": 200,
+                  "DaysToComplete": 7,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                },
+                {
+                  "Name": "Smart Lighting",
+                  "Level": 2,
+                  "Cost": 8000,
+                  "RentIncrease": 400,
+                  "DaysToComplete": 14,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                },
+                {
+                  "Name": "Home Automation System",
+                  "Level": 3,
+                  "Cost": 12000,
+                  "RentIncrease": 600,
+                  "DaysToComplete": 21,
+                  "PurchaseDate": "0001-01-01T00:00:00Z",
+                  "Prerequisite": null,
+                  "Applied": false
+                }
+              ]
+            },
+            "AppliedUpgrades": []
+          }
+        }
+      }
     },
     "Systems": [
-        {},
-        {
-            "Neighborhoods": {
-                "1": {
-                    "ID": 1,
-                    "Name": "Downtown",
-                    "PropertyIDs": [
-                        2,
-                        3,
-                        2,
-                        3
-                    ],
-                    "AveragePropertyValue": 30000,
-                    "RentBoostThreshold": 50,
-                    "RentBoostAmount": 10
-                }
+      {},
+      {},
+      {}
+    ],
+    "Indexes": {
+      "components.Addressable": {
+        "Property-61": {
+          "Key": {
+            "EntityType": "Property",
+            "ID": 61
+          },
+          "Components": {
+            "Addressable": {
+              "Address": "101 Maplewood Lane, Cedar Grove"
+            },
+            "Classifiable": {
+              "Type": "Residential",
+              "Subtype": "SingleFamily"
+            },
+            "Describable": {
+              "Description": "A cozy single-family home with a large backyard and modern amenities."
+            },
+            "Groupable": {
+              "GroupID": 4
+            },
+            "Nameable": {
+              "Name": "Maplewood Lane House"
+            },
+            "Ownable": {
+              "OwnerID": 0,
+              "Owned": false
+            },
+            "Purchaseable": {
+              "Cost": 300000,
+              "PurchaseDate": "0001-01-01T00:00:00Z"
+            },
+            "Rentable": {
+              "BaseRent": 1800,
+              "RentBoost": 0,
+              "LastRentCollectionDate": "0001-01-01T00:00:00Z"
+            },
+            "Upgradable": {
+              "PossibleUpgrades": {
+                "Cozy Enhancements": [
+                  {
+                    "Name": "Insulation Upgrade",
+                    "Level": 1,
+                    "Cost": 3000,
+                    "RentIncrease": 150,
+                    "DaysToComplete": 5,
+                    "PurchaseDate": "0001-01-01T00:00:00Z",
+                    "Prerequisite": null,
+                    "Applied": false
+                  },
+                  {
+                    "Name": "Energy-efficient Appliances",
+                    "Level": 2,
+                    "Cost": 6000,
+                    "RentIncrease": 300,
+                    "DaysToComplete": 10,
+                    "PurchaseDate": "0001-01-01T00:00:00Z",
+                    "Prerequisite": null,
+                    "Applied": false
+                  },
+                  {
+                    "Name": "Smart Thermostat",
+                    "Level": 3,
+                    "Cost": 9000,
+                    "RentIncrease": 450,
+                    "DaysToComplete": 15,
+                    "PurchaseDate": "0001-01-01T00:00:00Z",
+                    "Prerequisite": null,
+                    "Applied": false
+                  }
+                ],
+                "Exterior Enhancements": [
+                  {
+                    "Name": "New Patio",
+                    "Level": 1,
+                    "Cost": 5000,
+                    "RentIncrease": 250,
+                    "DaysToComplete": 5,
+                    "PurchaseDate": "0001-01-01T00:00:00Z",
+                    "Prerequisite": null,
+                    "Applied": false
+                  },
+                  {
+                    "Name": "Fire Pit Installation",
+                    "Level": 2,
+                    "Cost": 10000,
+                    "RentIncrease": 500,
+                    "DaysToComplete": 10,
+                    "PurchaseDate": "0001-01-01T00:00:00Z",
+                    "Prerequisite": null,
+                    "Applied": false
+                  },
+                  {
+                    "Name": "Outdoor Kitchen",
+                    "Level": 3,
+                    "Cost": 15000,
+                    "RentIncrease": 750,
+                    "DaysToComplete": 15,
+                    "PurchaseDate": "0001-01-01T00:00:00Z",
+                    "Prerequisite": null,
+                    "Applied": false
+                  }
+                ],
+                "Modern Upgrades": [
+                  {
+                    "Name": "Open-plan Kitchen",
+                    "Level": 1,
+                    "Cost": 4000,
+                    "RentIncrease": 200,
+                    "DaysToComplete": 7,
+                    "PurchaseDate": "0001-01-01T00:00:00Z",
+                    "Prerequisite": null,
+                    "Applied": false
+                  },
+                  {
+                    "Name": "Smart Lighting",
+                    "Level": 2,
+                    "Cost": 8000,
+                    "RentIncrease": 400,
+                    "DaysToComplete": 14,
+                    "PurchaseDate": "0001-01-01T00:00:00Z",
+                    "Prerequisite": null,
+                    "Applied": false
+                  },
+                  {
+                    "Name": "Home Automation System",
+                    "Level": 3,
+                    "Cost": 12000,
+                    "RentIncrease": 600,
+                    "DaysToComplete": 21,
+                    "PurchaseDate": "0001-01-01T00:00:00Z",
+                    "Prerequisite": null,
+                    "Applied": false
+                  }
+                ]
+              },
+              "AppliedUpgrades": []
             }
+          }
+        }
+      }
+      // Other component indexes
+    },
+    "OwnedPropertiesIndex": {},
+    // Index of neighborhood id -> property ids
+    "GroupPropertiesIndex": {
+      "4": [
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80
+      ]
+    },
+    "GroupUpgradedPercentages": {},
+    "GroupUpgradedCounts": {},
+    "Players": [
+      {
+        "Key": {
+          "EntityType": "Player",
+          "ID": 1
         },
-        {},
-        {}
+        "Components": {
+          "Funds": {
+            "Amount": 100000000
+          },
+          "Nameable": {
+            "Name": "Mark"
+          }
+        }
+      }
     ]
-}
+  }
 ```
 
 ---
