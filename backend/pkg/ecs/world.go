@@ -3,7 +3,6 @@ package ecs
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"sync"
 
 	"github.com/markbmullins/city-developer/pkg/components"
@@ -35,16 +34,16 @@ func NewWorld() *World {
 	}
 }
 
-func (w *World) AddComponentToIndex(entity *Entity, compType reflect.Type) {
-	compName := compType.String()
+func (w *World) AddComponentToIndex(entity *Entity, component interface{}) {
+	compName := typeNameOf(component)
 	if w.Indexes[compName] == nil {
 		w.Indexes[compName] = make(map[int]*Entity)
 	}
 	w.Indexes[compName][entity.ID] = entity
 }
 
-func (w *World) RemoveComponentFromIndex(entity *Entity, compType reflect.Type) {
-	compName := compType.String()
+func (w *World) RemoveComponentFromIndex(entity *Entity, component interface{}) {
+	compName := typeNameOf(component)
 	if index, exists := w.Indexes[compName]; exists {
 		delete(index, entity.ID)
 		if len(index) == 0 {
@@ -73,10 +72,8 @@ func (w *World) AddEntity(entity *Entity) {
 	w.nextEntityID++
 	entity.ID = id
 	w.Entities[id] = entity
-	for compKey := range entity.Components {
-		if t, ok := getTypeFromString(compKey); ok {
-			w.AddComponentToIndex(entity, t)
-		}
+	for _, component := range entity.Components {
+		w.AddComponentToIndex(entity, component)
 	}
 
 	if entity.Type == "Player" {
@@ -103,11 +100,8 @@ func (w *World) RemoveEntity(id int) {
 	if entity.Type == "Player" {
 		w.removePlayerFromIndex(entity)
 	}
-	for compKey := range entity.Components {
-		// Convert back to reflect.Type before removal
-		if t, ok := getTypeFromString(compKey); ok {
-			w.RemoveComponentFromIndex(entity, t)
-		}
+	for _, component := range entity.Components {
+		w.RemoveComponentFromIndex(entity, component)
 	}
 	delete(w.Entities, id)
 }
