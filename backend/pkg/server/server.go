@@ -14,7 +14,7 @@ import (
 var mu sync.Mutex
 
 type PartialWorld struct {
-	Entities                 map[string]*ecs.Entity `json:"entities"`
+	Entities                 map[int]*ecs.Entity `json:"entities"`
 	OwnedPropertiesIndex     map[int][]int          `json:"owned_properties_index"`     // ownerID -> propertyIDs
 	GroupPropertiesIndex     map[int][]int          `json:"group_properties_index"`     // groupID -> propertyIDs
 	GroupUpgradedPercentages map[int]float64        `json:"group_upgraded_percentages"` // groupID -> upgradedPercentage

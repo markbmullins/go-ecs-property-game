@@ -123,8 +123,8 @@ func handleBuyProperty(world *ecs.World, data BuyPropertyPayload, w http.Respons
 	propertyID := data.PropertyID
 	playerID := data.PlayerID
 
-	playerEntity := world.GetPlayer(playerID)
-	propertyEntity := world.GetProperty(propertyID)
+	playerEntity := world.GetEntity(playerID)
+	propertyEntity := world.GetEntity(propertyID)
 
 	playerFound := playerEntity != nil
 	propertyFound := propertyEntity != nil
@@ -134,9 +134,9 @@ func handleBuyProperty(world *ecs.World, data BuyPropertyPayload, w http.Respons
 		utils.SendResponse(w, http.StatusBadRequest, "Player or Property not found", nil)
 		return
 	}
-	funds, _ := ecs.GetComponent[components.Funds](playerEntity)
-	purchaseable, _ := ecs.GetComponent[components.Purchaseable](propertyEntity)
-	ownable, _ := ecs.GetComponent[components.Ownable](propertyEntity)
+	funds, _ := playerEntity.GetFunds()
+	purchaseable, _ := propertyEntity.GetPurchaseable()
+	ownable, _ := propertyEntity.GetOwnable()
 
 	log.Printf("Player funds: %f, Property price: %f\n", funds.Amount, purchaseable.Cost)
 	if funds.Amount >= purchaseable.Cost {
@@ -158,20 +158,20 @@ func handleUpgradeProperty(world *ecs.World, data UpgradePropertyPayload, w http
 	upgradePathName := data.PathName
 
 	// Retrieve the property entity
-	propertyEntity := world.GetProperty(propertyID)
+	propertyEntity := world.GetEntity(propertyID)
 	propertyFound := propertyEntity != nil
 	if !propertyFound {
 		utils.SendResponse(w, http.StatusNotFound, "Property not found", nil)
 		return
 	}
 
-	var ownable, _ = ecs.GetComponent[components.Ownable](propertyEntity)
+	var ownable, _ = propertyEntity.GetOwnable()
 	if !ownable.Owned {
 		utils.SendResponse(w, http.StatusBadRequest, "Property is not owned", nil)
 		return
 	}
 
-	upgradable, _ := ecs.GetComponent[components.Upgradable](propertyEntity)
+	upgradable, _ := propertyEntity.GetUpgradable()
 	if upgradable == nil {
 		utils.SendResponse(w, http.StatusBadRequest, "Property is not upgradable", nil)
 		return
@@ -194,8 +194,8 @@ func handleUpgradeProperty(world *ecs.World, data UpgradePropertyPayload, w http
 	// Retrieve the next upgrade details
 	nextUpgrade := upgradePath[currentLevel+1]
 
-	playerEntity := world.GetPlayer(ownable.OwnerID)
-	playerFunds, _ := ecs.GetComponent[components.Funds](playerEntity)
+	playerEntity := world.GetEntity(ownable.OwnerID)
+	playerFunds, _ := playerEntity.GetFunds()
 
 	// Deduct the upgrade cost
 	playerFunds.Amount -= nextUpgrade.Cost
@@ -235,7 +235,7 @@ func handleUpgradeProperty(world *ecs.World, data UpgradePropertyPayload, w http
 }
 
 func getPrerequisiteUpgrade(property *ecs.Entity, pathName string) *components.Upgrade {
-	var upgradable, _ = ecs.GetComponent[components.Upgradable](property)
+	var upgradable, _ = property.GetUpgradable()
 	var currentLevel = upgradable.CurrentUpgradeLevel(pathName)
 	if currentLevel == 0 {
 		return nil // No prerequisite for first upgrade
@@ -249,7 +249,7 @@ func getPrerequisiteUpgrade(property *ecs.Entity, pathName string) *components.U
 
 func handleSellProperty(world *ecs.World, data SellPropertyPayload, w http.ResponseWriter) {
 	propertyID := data.PropertyID
-	propertyEntity := world.GetProperty(propertyID)
+	propertyEntity := world.GetEntity(propertyID)
 
 	propertyFound := propertyEntity != nil
 	if !propertyFound {
@@ -257,21 +257,21 @@ func handleSellProperty(world *ecs.World, data SellPropertyPayload, w http.Respo
 		return
 	}
 
-	var ownable, owned = ecs.GetComponent[components.Ownable](propertyEntity)
-	if !owned {
+	var ownable, err = propertyEntity.GetOwnable()
+	if err != nil {
 		utils.SendResponse(w, http.StatusBadRequest, "Property is not owned", nil)
 		return
 	}
-	ownerEntity := world.GetPlayer(ownable.OwnerID)
+	ownerEntity := world.GetEntity(ownable.OwnerID)
 
 	if ownerEntity == nil {
 		utils.SendResponse(w, http.StatusBadRequest, "Owner not found", nil)
 		return
 	}
 
-	var purchaseable, _ = ecs.GetComponent[components.Purchaseable](propertyEntity)
+	var purchaseable, _ = propertyEntity.GetPurchaseable()
 	salePrice := purchaseable.Cost * 0.8
-	var fundsComponent, _ = ecs.GetComponent[components.Funds](ownerEntity)
+	var fundsComponent, _ = ownerEntity.GetFunds()
 	fundsComponent.Amount += salePrice
 
 	// Remove the property from the player's Properties array

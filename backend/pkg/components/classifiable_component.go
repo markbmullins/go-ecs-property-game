@@ -19,28 +19,97 @@ const (
 	Townhome     PropertySubtype = "Townhome"
 )
 
-// Subtypes for commercial properties
 const (
-	Amusement          PropertySubtype = "Amusement"
-	ArtGallery         PropertySubtype = "ArtGallery"
-	Bakery             PropertySubtype = "Bakery"
-	Bar                PropertySubtype = "Bar"
-	Cafe               PropertySubtype = "Cafe"
-	Clinic             PropertySubtype = "Clinic"
+	// Retail
+	Bookstore        PropertySubtype = "Bookstore"
+	ClothingStore    PropertySubtype = "ClothingStore"
+	ConvenienceStore PropertySubtype = "ConvenienceStore"
+	ElectronicsStore PropertySubtype = "ElectronicsStore"
+	Florist          PropertySubtype = "Florist"
+	FurnitureStore   PropertySubtype = "FurnitureStore"
+	JewelryStore     PropertySubtype = "JewelryStore"
+	LiquorStore      PropertySubtype = "LiquorStore"
+	Mall             PropertySubtype = "Mall"
+	PetStore         PropertySubtype = "PetStore"
+	Pharmacy         PropertySubtype = "Pharmacy"
+	ShoeStore        PropertySubtype = "ShoeStore"
+	Supermarket      PropertySubtype = "Supermarket"
+)
+
+const (
+	// Food & Beverage
+	Bakery            PropertySubtype = "Bakery"
+	Bar               PropertySubtype = "Bar"
+	Brewery           PropertySubtype = "Brewery"
+	Cafe              PropertySubtype = "Cafe"
+	IceCreamShop      PropertySubtype = "IceCreamShop"
+	Microbrewery      PropertySubtype = "Microbrewery"
+	NightClub         PropertySubtype = "NightClub"
+	Restaurant        PropertySubtype = "Restaurant"
+	Winery            PropertySubtype = "Winery"
+	WineryTastingRoom PropertySubtype = "WineryTastingRoom"
+)
+
+const (
+	// Services
+	AutoRepairShop   PropertySubtype = "AutoRepairShop"
+	CarWash          PropertySubtype = "CarWash"
+	Clinic           PropertySubtype = "Clinic"
+	DaycareCenter    PropertySubtype = "DaycareCenter"
+	DryCleaners      PropertySubtype = "DryCleaners"
+	GasStation       PropertySubtype = "GasStation"
+	Gym              PropertySubtype = "Gym"
+	Hotel            PropertySubtype = "Hotel"
+	MedicalOffice    PropertySubtype = "MedicalOffice"
+	Salon            PropertySubtype = "Salon"
+	Spa              PropertySubtype = "Spa"
+	TattooParlor     PropertySubtype = "TattooParlor"
+	VeterinaryClinic PropertySubtype = "VeterinaryClinic"
+)
+
+const (
+	// Entertainment
+	AmusementPark PropertySubtype = "AmusementPark"
+	Arcade        PropertySubtype = "Arcade"
+	ArtGallery    PropertySubtype = "ArtGallery"
+	BowlingAlley  PropertySubtype = "BowlingAlley"
+	ConcertHall   PropertySubtype = "ConcertHall"
+	EventVenue    PropertySubtype = "EventVenue"
+	GamingCenter  PropertySubtype = "GamingCenter"
+	MovieTheater  PropertySubtype = "MovieTheater"
+	Museum        PropertySubtype = "Museum"
+	SportsArena   PropertySubtype = "SportsArena"
+	Theater       PropertySubtype = "Theater"
+)
+
+const (
+	// Office & Business
+	AccountingFirm    PropertySubtype = "AccountingFirm"
+	ArchitecturalFirm PropertySubtype = "ArchitecturalFirm"
+	ConsultingFirm    PropertySubtype = "ConsultingFirm"
+	CoWorkingSpace    PropertySubtype = "CoWorkingSpace"
+	CreditUnion       PropertySubtype = "CreditUnion"
+	EngineeringFirm   PropertySubtype = "EngineeringFirm"
+	InsuranceFirm     PropertySubtype = "InsuranceFirm"
+	InvestmentBank    PropertySubtype = "InvestmentBank"
+	LawOffice         PropertySubtype = "LawOffice"
+	MortgageBank      PropertySubtype = "MortgageBank"
+	RealEstateOffice  PropertySubtype = "RealEstateOffice"
+	ResearchLab       PropertySubtype = "ResearchLab"
+	TechHub           PropertySubtype = "TechHub"
+)
+
+const (
+	// Other
 	DataCenter         PropertySubtype = "DataCenter"
 	DistributionCenter PropertySubtype = "DistributionCenter"
+	EducationalCenter  PropertySubtype = "EducationalCenter"
 	Factory            PropertySubtype = "Factory"
-	Gym                PropertySubtype = "Gym"
-	Hotel              PropertySubtype = "Hotel"
-	Industrial         PropertySubtype = "Industrial"
-	Mall               PropertySubtype = "Mall"
-	Museum             PropertySubtype = "Museum"
-	NightClub          PropertySubtype = "NightClub"
-	OfficeSpace        PropertySubtype = "OfficeSpace"
-	Restaurant         PropertySubtype = "Restaurant"
-	RetailStore        PropertySubtype = "RetailStore"
-	Salon              PropertySubtype = "Salon"
-	Warehouse          PropertySubtype = "Warehouse"
+	FitnessCenter      PropertySubtype = "FitnessCenter"
+	GreenBuilding      PropertySubtype = "GreenBuilding"
+	ParkingGarage      PropertySubtype = "ParkingGarage"
+	RecyclingCenter    PropertySubtype = "RecyclingCenter"
+	StorageFacility    PropertySubtype = "StorageFacility"
 )
 
 type Classifiable struct {

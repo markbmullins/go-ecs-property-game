@@ -1,77 +1,69 @@
 package ecs
 
 import (
+	"errors"
 	"fmt"
-	"reflect"
+	"strings"
 	"sync"
 )
 
-type ComponentName = string
-type EntityName = string
 type Entity struct {
-	Key        EntityKey
-	Components map[string]interface{}
+	ID         int
+	Type       string
+	Components map[string]interface{} // Type-safe storage for components
 	mu         sync.RWMutex
 }
 
-type EntityKey struct {
-	EntityType EntityName
-	ID         int
-}
-
-func NewEntityKey(entityType string, id int) string {
-	return fmt.Sprintf("%s-%d", entityType, id)
-}
-
-func (k EntityKey) ToString() string {
-	return fmt.Sprintf("%s-%d", k.EntityType, k.ID)
-}
-
-func (w *World) GetEntity(key EntityKey) *Entity {
-	return w.Entities[key.ToString()]
-}
-
-func (w *World) GetEntityStr(key string) *Entity {
-	return w.Entities[key]
-}
-
-func (w *World) GetEntityById(entityType string, id int) *Entity {
-	return w.Entities[NewEntityKey(entityType, id)]
-}
-
-func NewEntity(entityType string, id int) *Entity {
+// NewEntity creates a new entity with the specified type.
+func NewEntity(entityType string) *Entity {
 	return &Entity{
-		Key:        EntityKey{EntityType: entityType, ID: id},
+		ID:         -1, // ID assigned by the World
+		Type:       entityType,
 		Components: make(map[string]interface{}),
 	}
 }
 
-// AddComponent uses reflect.Type for type safety in the method signature.
-// Internally, it converts the reflect.Type to a string key.
-func AddComponent[T any](entity *Entity, component *T) {
-	entity.mu.Lock()
-	defer entity.mu.Unlock()
+// AddComponent adds a component to the entity.
+func (e *Entity) AddComponent(component interface{}) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
 
-	compType := reflect.TypeOf((*T)(nil)).Elem()
-	compKey := compType.Name()
+	typeName := typeNameOf(component)
+	if _, exists := e.Components[typeName]; exists {
+		return errors.New("component already exists")
+	}
 
-	// Register the type so we can convert back to reflect.Type later if needed.
-	registerType(compType)
-	entity.Components[compKey] = component
+	e.Components[typeName] = component
+	return nil
 }
 
-// GetComponent still uses reflect.Type to find the component type,
-// but this time we find the string key from the type registry.
-func GetComponent[T any](entity *Entity) (*T, bool) {
-	entity.mu.RLock()
-	defer entity.mu.RUnlock()
+// GetComponent retrieves a component of the specified type.
+func (e *Entity) GetComponent(componentType interface{}) (interface{}, error) {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
 
-	compType := reflect.TypeOf((*T)(nil)).Elem()
-	compKey := compType.Name()
-
-	component, exists := entity.Components[compKey]
+	typeName := typeNameOf(componentType)
+	component, exists := e.Components[typeName]
 	if !exists {
-		return nil, false
+		return nil, errors.New("component not found")
 	}
-	return component.(*T), true
+	return component, nil
+}
+
+// RemoveComponent removes a component of the specified type.
+func (e *Entity) RemoveComponent(componentType interface{}) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	typeName := typeNameOf(componentType)
+	delete(e.Components, typeName)
+}
+
+// Utility function to get the type name of a component.
+func typeNameOf(component interface{}) string {
+	fullTypeName := fmt.Sprintf("%T", component) // e.g., "*components.GameTime"
+	if strings.HasPrefix(fullTypeName, "*components.") {
+		return strings.TrimPrefix(fullTypeName, "*components.")
+	}
+	return fullTypeName
 }

@@ -24,7 +24,6 @@ func InitializeCedarGroveUpgrades() {
 // Residential Properties in Cedar Grove
 var CedarResidential = []*ecs.Entity{
 	entities.CreateProperty(
-		61,
 		"Maplewood Lane House",
 		"101 Maplewood Lane, Cedar Grove",
 		"A cozy single-family home with a large backyard and modern amenities.",
@@ -35,7 +34,6 @@ var CedarResidential = []*ecs.Entity{
 		4,
 	),
 	entities.CreateProperty(
-		62,
 		"Sunnybrook Townhome",
 		"202 Sunnybrook Drive, Cedar Grove",
 		"A charming townhome with modern finishes and a community garden.",
@@ -46,7 +44,6 @@ var CedarResidential = []*ecs.Entity{
 		4,
 	),
 	entities.CreateProperty(
-		63,
 		"Oakwood Apartments",
 		"303 Oakwood Road, Cedar Grove",
 		"Modern apartments with access to shared recreational facilities and secure parking.",
@@ -57,7 +54,6 @@ var CedarResidential = []*ecs.Entity{
 		4,
 	),
 	entities.CreateProperty(
-		64,
 		"Cedar Grove Condos",
 		"404 Cedar Boulevard, Cedar Grove",
 		"Condominiums with private balconies and state-of-the-art home automation systems.",
@@ -68,7 +64,6 @@ var CedarResidential = []*ecs.Entity{
 		4,
 	),
 	entities.CreateProperty(
-		65,
 		"Cedar Grove Estates",
 		"505 Cedar Lane, Cedar Grove",
 		"Spacious multifamily residences with modern amenities and landscaped gardens.",
@@ -79,7 +74,6 @@ var CedarResidential = []*ecs.Entity{
 		4,
 	),
 	entities.CreateProperty(
-		66,
 		"Cedar Grove Villas",
 		"606 Villa Avenue, Cedar Grove",
 		"Luxurious villas featuring private pools and high-end finishes.",
@@ -90,7 +84,6 @@ var CedarResidential = []*ecs.Entity{
 		4,
 	),
 	entities.CreateProperty(
-		67,
 		"Maplewood Condos",
 		"707 Maplewood Street, Cedar Grove",
 		"Condominiums with smart home integrations and access to communal lounges.",
@@ -101,7 +94,6 @@ var CedarResidential = []*ecs.Entity{
 		4,
 	),
 	entities.CreateProperty(
-		68,
 		"Sunnybrook Apartments",
 		"808 Sunnybrook Road, Cedar Grove",
 		"Apartments with modern designs and access to recreational facilities.",
@@ -112,7 +104,6 @@ var CedarResidential = []*ecs.Entity{
 		4,
 	),
 	entities.CreateProperty(
-		69,
 		"Cedar Grove Flats",
 		"909 Cedar Circle, Cedar Grove",
 		"Modern flats with integrated smart systems and community amenities.",
@@ -123,7 +114,6 @@ var CedarResidential = []*ecs.Entity{
 		4,
 	),
 	entities.CreateProperty(
-		70,
 		"Oakridge Apartments",
 		"1001 Oakridge Road, Cedar Grove",
 		"Spacious apartments with eco-friendly features and access to green spaces.",
@@ -138,7 +128,6 @@ var CedarResidential = []*ecs.Entity{
 // Commercial Properties in Cedar Grove
 var CedarCommercial = []*ecs.Entity{
 	entities.CreateProperty(
-		71,
 		"Cozy Corner Café",
 		"10 Cozy Street, Cedar Grove",
 		"A friendly neighborhood café serving fresh coffee and pastries.",
@@ -149,18 +138,16 @@ var CedarCommercial = []*ecs.Entity{
 		4,
 	),
 	entities.CreateProperty(
-		72,
 		"Suburban Shoppe",
 		"20 Market Lane, Cedar Grove",
 		"A local retail store offering a variety of household items and essentials.",
 		components.Commercial,
-		components.RetailStore,
+		components.FurnitureStore,
 		5000.0,
 		1100000.0,
 		4,
 	),
 	entities.CreateProperty(
-		73,
 		"Cedar Gym",
 		"30 Fitness Boulevard, Cedar Grove",
 		"A comprehensive fitness center with modern equipment and personal trainers.",
@@ -171,29 +158,26 @@ var CedarCommercial = []*ecs.Entity{
 		4,
 	),
 	entities.CreateProperty(
-		74,
 		"Playtime Arcade",
 		"40 Fun Avenue, Cedar Grove",
 		"An arcade offering a variety of games and entertainment for all ages.",
 		components.Commercial,
-		components.Amusement,
+		components.Arcade,
 		8500.0,
 		1750000.0,
 		4,
 	),
 	entities.CreateProperty(
-		75,
 		"Tech Mart",
 		"50 Tech Avenue, Cedar Grove",
 		"A retail store specializing in the latest tech gadgets and accessories.",
 		components.Commercial,
-		components.RetailStore,
+		components.ElectronicsStore,
 		7500.0,
 		1600000.0,
 		4,
 	),
 	entities.CreateProperty(
-		76,
 		"Cedar Pharmacy",
 		"60 Health Street, Cedar Grove",
 		"A pharmacy supplying affordable medications and health products.",
@@ -204,7 +188,6 @@ var CedarCommercial = []*ecs.Entity{
 		4,
 	),
 	entities.CreateProperty(
-		77,
 		"Simple Salon",
 		"70 Beauty Lane, Cedar Grove",
 		"A basic salon offering essential beauty and grooming services.",
@@ -215,18 +198,16 @@ var CedarCommercial = []*ecs.Entity{
 		4,
 	),
 	entities.CreateProperty(
-		78,
 		"Affordable Arcade",
 		"80 Fun Boulevard, Cedar Grove",
 		"An arcade providing a variety of budget-friendly games and entertainment options.",
 		components.Commercial,
-		components.Amusement,
+		components.Arcade,
 		8500.0,
 		1750000.0,
 		4,
 	),
 	entities.CreateProperty(
-		79,
 		"Cedar Bakery",
 		"90 Baker Street, Cedar Grove",
 		"A bakery offering a variety of fresh baked goods and pastries.",
@@ -237,12 +218,11 @@ var CedarCommercial = []*ecs.Entity{
 		4,
 	),
 	entities.CreateProperty(
-		80,
 		"Playtime Arcade",
 		"100 Arcade Avenue, Cedar Grove",
 		"An arcade offering a variety of games and fun for families and friends.",
 		components.Commercial,
-		components.Amusement,
+		components.Arcade,
 		8500.0,
 		1750000.0,
 		4,

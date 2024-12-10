@@ -2,87 +2,105 @@ package ecs
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
+	"sync"
 
 	"github.com/markbmullins/city-developer/pkg/components"
 )
 
 type World struct {
-	Entities map[string]*Entity
-	Systems  []System
+	Entities          map[int]*Entity
+	Systems           []System
+	nextEntityID      int
+	nextEntityIDMutex sync.Mutex
 	//lookup table to quickly find which entities have a given component
-	Indexes                  map[string]map[string]*Entity // componentName -> (entityKey -> entityPointer)
-	OwnedPropertiesIndex     map[int][]int                 // ownerID -> propertyIDs
-	GroupPropertiesIndex     map[int][]int                 // groupID -> propertyIDs
-	GroupUpgradedPercentages map[int]float64               // groupID -> upgradedPercentage
-	GroupUpgradedCounts      map[int]int                   // groupID -> number of properties with >=1 upgrade
+	Indexes                  map[string]map[int]*Entity // componentName -> (entityId -> entityPointer)
+	OwnedPropertiesIndex     map[int][]int              // ownerID -> propertyIDs
+	GroupPropertiesIndex     map[int][]int              // groupID -> propertyIDs
+	GroupUpgradedPercentages map[int]float64            // groupID -> upgradedPercentage
+	GroupUpgradedCounts      map[int]int                // groupID -> number of properties with >=1 upgrade
 	Players                  []*Entity
 }
 
 func NewWorld() *World {
 	return &World{
-		Entities:                 make(map[string]*Entity),
-		Indexes:                  make(map[string]map[string]*Entity),
+		Entities:                 make(map[int]*Entity),
+		Indexes:                  make(map[string]map[int]*Entity),
 		OwnedPropertiesIndex:     make(map[int][]int),
 		GroupPropertiesIndex:     make(map[int][]int),
 		GroupUpgradedPercentages: make(map[int]float64),
 		GroupUpgradedCounts:      make(map[int]int),
+		nextEntityID:             1, // Start at 1 since 0 is reserved for GameTime
 	}
 }
 
 func (w *World) AddComponentToIndex(entity *Entity, compType reflect.Type) {
 	compName := compType.String()
 	if w.Indexes[compName] == nil {
-		w.Indexes[compName] = make(map[string]*Entity)
+		w.Indexes[compName] = make(map[int]*Entity)
 	}
-	w.Indexes[compName][entity.Key.ToString()] = entity
+	w.Indexes[compName][entity.ID] = entity
 }
 
 func (w *World) RemoveComponentFromIndex(entity *Entity, compType reflect.Type) {
 	compName := compType.String()
 	if index, exists := w.Indexes[compName]; exists {
-		delete(index, entity.Key.ToString())
+		delete(index, entity.ID)
 		if len(index) == 0 {
 			delete(w.Indexes, compName) // Clean up empty index
 		}
 	}
 }
 
+func (w *World) AddSpecificEntity(id int, entity *Entity) {
+	if _, exists := w.Entities[id]; exists {
+		panic(fmt.Sprintf("Entity ID %d already exists!", id)) // Ensure no duplicate IDs
+	}
+	entity.ID = id
+	w.Entities[id] = entity
+}
+
+func (w *World) GetEntity(id int) *Entity {
+	return w.Entities[id]
+}
+
 func (w *World) AddEntity(entity *Entity) {
-	w.Entities[entity.Key.ToString()] = entity
+	w.nextEntityIDMutex.Lock()
+	defer w.nextEntityIDMutex.Unlock()
+
+	id := w.nextEntityID
+	w.nextEntityID++
+	entity.ID = id
+	w.Entities[id] = entity
 	for compKey := range entity.Components {
 		if t, ok := getTypeFromString(compKey); ok {
 			w.AddComponentToIndex(entity, t)
 		}
 	}
 
-	if entity.Key.EntityType == "Player" {
+	if entity.Type == "Player" {
 		w.Players = append(w.Players, entity)
 	}
 
 	// Update indexing for ownership and group
-	if entity.Key.EntityType == "Property" {
-		if ownable, ok := GetComponent[components.Ownable](entity); ok && ownable.Owned {
-			w.OwnedPropertiesIndex[ownable.OwnerID] = append(w.OwnedPropertiesIndex[ownable.OwnerID], entity.Key.ID)
+	if entity.Type == "Property" {
+		if ownable, err := entity.GetOwnable(); err != nil && ownable.Owned {
+			w.OwnedPropertiesIndex[ownable.OwnerID] = append(w.OwnedPropertiesIndex[ownable.OwnerID], entity.ID)
 		}
-		if groupable, ok := GetComponent[components.Groupable](entity); ok {
-			w.GroupPropertiesIndex[groupable.GroupID] = append(w.GroupPropertiesIndex[groupable.GroupID], entity.Key.ID)
+		if groupable, err := entity.GetGroupable(); err != nil {
+			w.GroupPropertiesIndex[groupable.GroupID] = append(w.GroupPropertiesIndex[groupable.GroupID], entity.ID)
 		}
 	}
 
 }
 
-func (w *World) GetEntityByType(entityType string, id int) *Entity {
-	return w.Entities[NewEntityKey(entityType, id)]
-}
-
-func (w *World) RemoveEntity(key EntityKey) {
-	id := key.ToString()
+func (w *World) RemoveEntity(id int) {
 	entity, exists := w.Entities[id]
 	if !exists {
 		return
 	}
-	if entity.Key.EntityType == "Player" {
+	if entity.Type == "Player" {
 		w.removePlayerFromIndex(entity)
 	}
 	for compKey := range entity.Components {
@@ -125,8 +143,8 @@ func (w *World) BuyProperty(propertyID int, ownerID int) {
 }
 
 func (w *World) SellProperty(propertyID int) {
-	propertyEntity := w.GetProperty(propertyID)
-	ownableComponent, _ := GetComponent[components.Ownable](propertyEntity)
+	propertyEntity := w.Entities[propertyID]
+	ownableComponent, _ := propertyEntity.GetOwnable()
 	ownerId := ownableComponent.OwnerID
 
 	// Remove from old owner
@@ -159,20 +177,19 @@ func (w *World) GetOwnedEntities(ownerID int) []*Entity {
 		return results
 	}
 	for _, pid := range propertyIDs {
-		key := EntityKey{EntityType: "Property", ID: pid}
-		entity := w.GetEntity(key)
-		if entity != nil {
-			results = append(results, entity)
+		propertyEntity := w.Entities[pid]
+		if propertyEntity != nil {
+			results = append(results, propertyEntity)
 		}
 	}
 	return results
 }
 
 func (w *World) GetCurrentGameTime() (*components.GameTime, error) {
-	timeComp := w.Entities[NewEntityKey("GameTime", 0)]
+	timeComp := w.Entities[0]
 	if timeComp != nil {
-		gameTimeComp, ok := GetComponent[components.GameTime](timeComp)
-		if ok && gameTimeComp != nil {
+		gameTimeComp, err := timeComp.GetGameTime()
+		if err == nil {
 			return gameTimeComp, nil
 		}
 	}
@@ -180,8 +197,8 @@ func (w *World) GetCurrentGameTime() (*components.GameTime, error) {
 }
 
 func (w *World) ApplyUpgradeToProperty(property *Entity, upgrade *components.Upgrade) error {
-	upgradable, ok := GetComponent[components.Upgradable](property)
-	if !ok {
+	upgradable, err := property.GetUpgradable()
+	if err != nil {
 		return errors.New("property not upgradable")
 	}
 
@@ -191,11 +208,11 @@ func (w *World) ApplyUpgradeToProperty(property *Entity, upgrade *components.Upg
 	// Apply the new upgrade
 	upgrade.Applied = true
 	upgradable.AppliedUpgrades = append(upgradable.AppliedUpgrades, upgrade)
-	AddComponent(property, upgradable) // update property component
+	property.AddComponent(upgradable) // update property component
 
 	// If this is the first applied upgrade, we need to update the group's count
 	if hadNoUpgrades {
-		groupable, _ := GetComponent[components.Groupable](property)
+		groupable, _ := property.GetGroupable()
 		groupID := groupable.GroupID
 		w.GroupUpgradedCounts[groupID]++ // increment count of upgraded props in this group
 
@@ -233,7 +250,7 @@ func (w *World) GetEntitiesInGroup(groupID int) []*Entity {
 
 	var entities []*Entity
 	for _, id := range groupPropertyIds {
-		entities = append(entities, w.Entities[NewEntityKey("Property", id)])
+		entities = append(entities, w.Entities[id])
 	}
 
 	return entities

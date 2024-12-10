@@ -11,14 +11,13 @@ import (
  * Funds: The current funds available to the player.
  */
 func CreatePlayer(
-	id int,
 	name string,
 	initialFunds float64,
 ) *ecs.Entity {
-	player := ecs.NewEntity("Player", id)
+	player := ecs.NewEntity("Player")
 
-	ecs.AddComponent(player, &components.Nameable{Name: name})
-	ecs.AddComponent(player, &components.Funds{Amount: initialFunds})
+	player.AddComponent(&components.Information{Name: name})
+	player.AddComponent(&components.Funds{Amount: initialFunds})
 
 	return player
 }

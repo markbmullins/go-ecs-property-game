@@ -15,9 +15,9 @@ func InitializeGame() *ecs.World {
 	initialDate := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
 
 	timeEntity := entities.CreateGameTime(initialDate, 1)
-	world.AddEntity(timeEntity)
+	world.AddSpecificEntity(0, timeEntity)
 
-	playerEntity := entities.CreatePlayer(1, "Mark", 100000000)
+	playerEntity := entities.CreatePlayer("Mark", 100000000)
 	world.AddEntity(playerEntity)
 
 	initializeProperties(world)
@@ -54,7 +54,7 @@ func initializeProperties(world *ecs.World) {
 }
 
 func initializeSystems(world *ecs.World) {
-	world.AddSystem(&systems.IncomeSystem{})
+	world.AddSystem(&systems.RentCollectionSystem{})
 	world.AddSystem(&systems.PropertyManagementSystem{})
 	world.AddSystem(&systems.TimeSystem{})
 }

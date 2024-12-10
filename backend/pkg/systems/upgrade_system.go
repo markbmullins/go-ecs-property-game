@@ -1,7 +1,6 @@
 package systems
 
 import (
-	"github.com/markbmullins/city-developer/pkg/components"
 	"github.com/markbmullins/city-developer/pkg/ecs"
 )
 
@@ -13,8 +12,8 @@ func (s *UpgradeSystem) Update(world *ecs.World) {
 
 	// Checks if upgrades have completed and applies them
 	for _, property := range upgradableEntities {
-		var ownableComponent, _ = ecs.GetComponent[components.Ownable](property)
-		var upgradableComponent, _ = ecs.GetComponent[components.Upgradable](property)
+		var ownableComponent, _ = property.GetOwnable()
+		var upgradableComponent, _ = property.GetUpgradable()
 		var upgrades = upgradableComponent.AppliedUpgrades
 		if ownableComponent.Owned && len(upgrades) > 0 {
 			for _, upgrade := range upgrades {

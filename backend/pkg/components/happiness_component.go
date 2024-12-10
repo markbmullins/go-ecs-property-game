@@ -1,4 +1,4 @@
-package components
+	package components
 
 // This can be attached to tenants, customers, or any entity affected by conditions.
 type Happiness struct {

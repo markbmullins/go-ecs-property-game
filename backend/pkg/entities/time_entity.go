@@ -15,9 +15,9 @@ func CreateGameTime(
 	currentDate time.Time,
 	rentCollectionDay int,
 ) *ecs.Entity {
-	gameTime := ecs.NewEntity("GameTime", 0)
+	gameTime := ecs.NewEntity("GameTime")
 
-	ecs.AddComponent(gameTime, &components.GameTime{
+	gameTime.AddComponent(&components.GameTime{
 		CurrentDate:       currentDate,
 		IsPaused:          false,
 		SpeedMultiplier:   1.0,

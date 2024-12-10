@@ -8,7 +8,7 @@ import (
 )
 
 /** Creates a residential or commercial property entity in the game.
- * A property entity has the following components:  
+ * A property entity has the following components:
  * Nameable: The name of the property.
  * Addressable: The address of the property.
  * Describable: The description of the property.
@@ -20,7 +20,6 @@ import (
  * Groupable: The group ID of the property.
  */
 func CreateProperty(
-	id int,
 	name string,
 	address string,
 	description string,
@@ -30,24 +29,22 @@ func CreateProperty(
 	price float64,
 	groupID int,
 ) *ecs.Entity {
-	property := ecs.NewEntity("Property", id)
+	property := ecs.NewEntity("Property")
 
-	ecs.AddComponent(property, &components.Nameable{Name: name})
-	ecs.AddComponent(property, &components.Addressable{Address: address})
-	ecs.AddComponent(property, &components.Describable{Description: description})
-	ecs.AddComponent(property, &components.Classifiable{Type: propertyType, Subtype: subtype})
-	ecs.AddComponent(property, &components.Rentable{BaseRent: baseRent, RentBoost: 0, LastRentCollectionDate: time.Time{}})
-	ecs.AddComponent(property, &components.Purchaseable{Cost: price, PurchaseDate: time.Time{}})
-	ecs.AddComponent(property, &components.Ownable{OwnerID: 0, Owned: false})
-	ecs.AddComponent(property, &components.Upgradable{PossibleUpgrades: map[string][]*components.Upgrade{}, AppliedUpgrades: []*components.Upgrade{}})
-	ecs.AddComponent(property, &components.Groupable{GroupID: groupID})
+	property.AddComponent(&components.Information{Description: description, Name: name, Address: address})
+	property.AddComponent(&components.Classifiable{Type: propertyType, Subtype: subtype})
+	property.AddComponent(&components.Rentable{BaseRent: baseRent, RentBoost: 0, LastRentCollectionDate: time.Time{}})
+	property.AddComponent(&components.Purchaseable{Cost: price, PurchaseDate: time.Time{}})
+	property.AddComponent(&components.Ownable{OwnerID: 0, Owned: false})
+	property.AddComponent(&components.Upgradable{PossibleUpgrades: map[string][]*components.Upgrade{}, AppliedUpgrades: []*components.Upgrade{}})
+	property.AddComponent(&components.Groupable{GroupID: groupID})
 
 	return property
 }
 
 func AddUpgradesToProperty(property *ecs.Entity, upgradePaths map[string][]*components.Upgrade) {
-	upgradable, exists := ecs.GetComponent[components.Upgradable](property)
-	if !exists {
+	upgradable, err := property.GetUpgradable()
+	if err != nil {
 		// If the component doesn't exist, create it
 		upgradable = &components.Upgradable{
 			PossibleUpgrades: upgradePaths,
@@ -57,7 +54,7 @@ func AddUpgradesToProperty(property *ecs.Entity, upgradePaths map[string][]*comp
 		upgradable.PossibleUpgrades = upgradePaths
 	}
 	// Add or replace the component in the entity
-	ecs.AddComponent(property, upgradable)
+	property.AddComponent(upgradable)
 }
 
 func CreateUpgrade(
@@ -76,7 +73,7 @@ func CreateUpgrade(
 		DaysToComplete: daysToComplete,
 		PurchaseDate:   time.Time{}, // Default to zero time
 		Prerequisite:   prerequisite,
-		Applied:        false,       // Default to not applied
+		Applied:        false, // Default to not applied
 	}
 }
 
